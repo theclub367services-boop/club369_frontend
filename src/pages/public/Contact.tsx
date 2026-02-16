@@ -228,9 +228,9 @@ const Contact: React.FC = () => {
                                 location_on
                             </motion.span>
                             <span>
-                                One World Trade Center<br />
-                                Suite 8500, New York<br />
-                                NY 10007, USA
+                                Door No. D-16/3, First Floor ,6th Cross, Western Extention, Thillai Nagar, <br />
+                                near kims hospital,Tiruchirappalli - 620018<br />
+                                TamilNadu, India
                             </span>
                         </motion.div>
                     </motion.div>
@@ -245,8 +245,8 @@ const Contact: React.FC = () => {
                         <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-primary pl-4">Direct Lines</h2>
                         <div className="space-y-4">
                             {[
-                                { icon: 'mail', label: 'Membership Inquiries', value: 'concierge@club369.com' },
-                                { icon: 'call', label: 'Priority Support', value: '+1 (888) 369-CLUB' }
+                                { icon: 'mail', label: 'Membership Inquiries', value: 'theclub369.services@gmail.com' },
+                                { icon: 'call', label: 'Priority Support', value: '+91 6380343437' }
                             ].map((item, i) => (
                                 <motion.div
                                     key={i}

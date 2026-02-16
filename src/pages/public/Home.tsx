@@ -1,8 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import Navbar from '../../components/layout/Navbar';
-import Footer from '../../components/layout/Footer';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import Navbar from "../../components/layout/Navbar";
+import Footer from "../../components/layout/Footer";
+import { Link } from "react-router-dom";
+import aboutImage from '../../../public/images/about-us.jpg';
+import cuephoriaLogo from '../../../public/images/cuephoria.jpeg';
+import aasifeBiriyaniLogo from '../../../public/images/aasife.jpeg';
+import bambooGardenLogo from '../../../public/images/bamboo.jpeg';
+import turf45Logo from '../../../public/images/turf-45.jpeg';
+import sporticLogo from '../../../public/images/sportic-logo.jpeg';
+import teashopLogo from '../../../public/images/tea-shop.jpeg';
+import unisexLogo from '../../../public/images/unisex.jpeg';
+import goatfarmLogo from '../../../public/images/goat-farm.jpeg';
+import photographyLogo from '../../../public/images/photography.jpeg';
+import medicalLogo from '../../../public/images/medical.jpeg';
+import fireworksLogo from '../../../public/images/fireworks.jpeg';
+import snookerLogo from '../../../public/images/snooker.jpeg';
 
 const Home: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -12,7 +25,7 @@ const Home: React.FC = () => {
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
   // Multiple parallax layers with different speeds
@@ -24,7 +37,11 @@ const Home: React.FC = () => {
   // Rotation and scale effects
   const rotate = useTransform(smoothProgress, [0, 1], [0, 360]);
   const scale = useTransform(smoothProgress, [0, 0.5, 1], [1, 1.2, 0.8]);
-  const opacity = useTransform(smoothProgress, [0, 0.3, 0.7, 1], [1, 0.8, 0.6, 0.3]);
+  const opacity = useTransform(
+    smoothProgress,
+    [0, 0.3, 0.7, 1],
+    [1, 0.8, 0.6, 0.3],
+  );
 
   // Mouse parallax effect
   useEffect(() => {
@@ -35,8 +52,8 @@ const Home: React.FC = () => {
       });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   return (
@@ -77,8 +94,8 @@ const Home: React.FC = () => {
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              x: mousePosition.x * (i % 3 + 1),
-              y: mousePosition.y * (i % 3 + 1),
+              x: mousePosition.x * ((i % 3) + 1),
+              y: mousePosition.y * ((i % 3) + 1),
             }}
             animate={{
               y: [0, -30, 0],
@@ -95,7 +112,10 @@ const Home: React.FC = () => {
 
       <main className="relative z-10 flex-grow">
         {/* 1. HERO SECTION with Enhanced Parallax */}
-        <section id="hero" className="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 relative overflow-hidden">
+        <section
+          id="hero"
+          className="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 relative overflow-hidden"
+        >
           {/* Background elements with mouse parallax */}
           <motion.div
             className="absolute inset-0 pointer-events-none"
@@ -125,7 +145,7 @@ const Home: React.FC = () => {
                 ease: "easeInOut",
               }}
             >
-              Welcoming Today • Inspiring Tomorrow
+              Uniting Today • Inspiring Tomorrow
             </motion.span>
 
             <motion.h1
@@ -159,10 +179,16 @@ const Home: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
-              <Link to="/payment" className="group relative w-full sm:w-auto overflow-hidden rounded-lg bg-white px-8 md:px-10 py-4 text-black transition-all hover:bg-gray-200 text-center uppercase font-bold text-lg hover:scale-105">
+              <Link
+                to="/payment"
+                className="group relative w-full sm:w-auto overflow-hidden rounded-lg bg-white px-8 md:px-10 py-4 text-black transition-all hover:bg-gray-200 text-center uppercase font-bold text-lg hover:scale-105"
+              >
                 Join The Club
               </Link>
-              <Link to="/manifesto" className="w-full sm:w-auto px-8 md:px-10 py-4 border border-white/20 rounded-lg text-white font-bold text-lg uppercase tracking-wide hover:bg-white/5 transition-all text-center hover:scale-105">
+              <Link
+                to="/manifesto"
+                className="w-full sm:w-auto px-8 md:px-10 py-4 border border-white/20 rounded-lg text-white font-bold text-lg uppercase tracking-wide hover:bg-white/5 transition-all text-center hover:scale-105"
+              >
                 Read Manifesto
               </Link>
             </motion.div>
@@ -195,7 +221,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 2. ABOUT US with Parallax */}
-        <section id="about" className="py-24 md:py-32 relative border-t border-white/5">
+        <section
+          id="about"
+          className="py-24 md:py-32 relative border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -215,7 +244,7 @@ const Home: React.FC = () => {
                 {[
                   "CLUB369 is a dynamic business community designed to help individuals learn, earn, trade, and launch their own startups.",
                   "We provide expert guidance in business strategy and digital marketing, empowering members to grow with confidence.",
-                  "Members also gain exclusive access to CLUB369 ventures, tools, and networking opportunities, creating a strong ecosystem for sustainable success."
+                  "Members also gain exclusive access to CLUB369 ventures, tools, and networking opportunities, creating a strong ecosystem for sustainable success.",
                 ].map((text, i) => (
                   <motion.p
                     key={i}
@@ -238,7 +267,7 @@ const Home: React.FC = () => {
               className="relative rounded-2xl overflow-hidden border border-white/10 aspect-video md:aspect-square"
             >
               <motion.img
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2301&auto=format&fit=crop"
+                src={aboutImage}
                 alt="About US"
                 className="w-full h-full object-cover"
                 whileHover={{ scale: 1.1 }}
@@ -249,7 +278,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 3. WHY 369? with Rotating Effect */}
-        <section id="why369" className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden">
+        <section
+          id="why369"
+          className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden"
+        >
           <div className="max-w-7xl mx-auto px-6 text-center mb-16">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-4 uppercase"
@@ -279,7 +311,7 @@ const Home: React.FC = () => {
               {[
                 "The 369 Manifestation Method is a powerful practice rooted in clarity, intention, and aligned action.",
                 "By focusing your thoughts, writing your affirmations, and reinforcing belief at key moments of the day, you begin to align your energy with your goals.",
-                "369 is more than a method—it's a mindset that trains your focus, discipline, and confidence to turn intention into reality..!"
+                "369 is more than a method—it's a mindset that trains your focus, discipline, and confidence to turn intention into reality..!",
               ].map((text, i) => (
                 <motion.p
                   key={i}
@@ -318,7 +350,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 4. OUR VISION with Scale Effect */}
-        <section id="vision" className="py-24 md:py-32 border-t border-white/5 relative">
+        <section
+          id="vision"
+          className="py-24 md:py-32 border-t border-white/5 relative"
+        >
           <div className="max-w-4xl mx-auto px-6 text-center">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-12 uppercase"
@@ -333,18 +368,26 @@ const Home: React.FC = () => {
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.02, borderColor: "rgba(139, 92, 246, 0.3)" }}
+              whileHover={{
+                scale: 1.02,
+                borderColor: "rgba(139, 92, 246, 0.3)",
+              }}
               transition={{ duration: 0.3 }}
             >
               <p className="text-2xl md:text-4xl font-light italic text-gray-300">
-                "We aim to create sustainable business ventures individually for CLUB369 members, empowering them to achieve financial independence and growth."
+                "We aim to create sustainable business ventures individually for
+                CLUB369 members, empowering them to achieve financial
+                independence and growth."
               </p>
             </motion.div>
           </div>
         </section>
 
         {/* 5. BUSINESS EMPOWERMENT & NETWORKING with Stagger Effect */}
-        <section id="networking" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="networking"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center md:text-left"
@@ -356,8 +399,14 @@ const Home: React.FC = () => {
             </motion.h2>
             <div className="grid md:grid-cols-2 gap-8">
               {[
-                { title: "Business Empowerment", desc: "Transforming ideas into scalable ventures" },
-                { title: "Networking", desc: "Connecting you with like-minded entrepreneurs, industry experts, and business leaders through exclusive events and sessions." }
+                {
+                  title: "Business Empowerment",
+                  desc: "Transforming ideas into scalable ventures",
+                },
+                {
+                  title: "Networking",
+                  desc: "Connecting you with like-minded entrepreneurs, industry experts, and business leaders through exclusive events and sessions.",
+                },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -366,9 +415,14 @@ const Home: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.2 }}
-                  whileHover={{ y: -10, borderColor: "rgba(139, 92, 246, 0.5)" }}
+                  whileHover={{
+                    y: -10,
+                    borderColor: "rgba(139, 92, 246, 0.5)",
+                  }}
                 >
-                  <h3 className="text-2xl font-bold text-primary mb-4 uppercase">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-4 uppercase">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400 italic">{item.desc}</p>
                 </motion.div>
               ))}
@@ -377,7 +431,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 6. TRADING POTENTIAL with 3D Card Effect */}
-        <section id="trading" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="trading"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-16 uppercase"
@@ -389,9 +446,18 @@ const Home: React.FC = () => {
             </motion.h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { title: "DAILY SIGNALS", desc: "Steady and disciplined profit potential with expert signals." },
-                { title: "TRADING KNOWLEDGE", desc: "Learn from foundational concepts to advanced strategies." },
-                { title: "LIMITED USER BASE", desc: "Focused mentorship and personalized support for every member." }
+                {
+                  title: "DAILY SIGNALS",
+                  desc: "Steady and disciplined profit potential with expert signals.",
+                },
+                {
+                  title: "TRADING KNOWLEDGE",
+                  desc: "Learn from foundational concepts to advanced strategies.",
+                },
+                {
+                  title: "LIMITED USER BASE",
+                  desc: "Focused mentorship and personalized support for every member.",
+                },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -403,7 +469,9 @@ const Home: React.FC = () => {
                   whileHover={{ scale: 1.05, rotateY: 5 }}
                   style={{ transformStyle: "preserve-3d" }}
                 >
-                  <h3 className="text-xl font-bold mb-4 uppercase">{item.title}</h3>
+                  <h3 className="text-xl font-bold mb-4 uppercase">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400 leading-relaxed">{item.desc}</p>
                 </motion.div>
               ))}
@@ -412,7 +480,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 7. BUSINESS EXPANSION */}
-        <section id="expansion" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="expansion"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center md:text-right"
@@ -424,9 +495,18 @@ const Home: React.FC = () => {
             </motion.h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { title: "Digital Marketing", desc: "Targeted strategies to scale your existing business." },
-                { title: "Business Strategy", desc: "Ideas to transform underperforming businesses." },
-                { title: "Business Startup", desc: "Collaboration to turn ideas into successful ventures." }
+                {
+                  title: "Digital Marketing",
+                  desc: "Targeted strategies to scale your existing business.",
+                },
+                {
+                  title: "Business Strategy",
+                  desc: "Ideas to transform underperforming businesses.",
+                },
+                {
+                  title: "Business Startup",
+                  desc: "Collaboration to turn ideas into successful ventures.",
+                },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -437,7 +517,9 @@ const Home: React.FC = () => {
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
                 >
-                  <h3 className="text-xl font-bold text-primary mb-4 uppercase">{item.title}</h3>
+                  <h3 className="text-xl font-bold text-primary mb-4 uppercase">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400">{item.desc}</p>
                 </motion.div>
               ))}
@@ -446,7 +528,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 8. CLUB OPPORTUNITIES with Fade-In Effect */}
-        <section id="opportunities" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="opportunities"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
@@ -458,9 +543,18 @@ const Home: React.FC = () => {
             </motion.h2>
             <div className="grid md:grid-cols-3 gap-12">
               {[
-                { title: "Club Access", desc: "Complimentary access to all current and future ventures." },
-                { title: "Club Meetups", desc: "Regular sessions with industry experts to share knowledge." },
-                { title: "Medical Insurance", desc: "Coverage of up to ₹2 lakh for our members." }
+                {
+                  title: "Club Access",
+                  desc: "Complimentary access to all current and future ventures.",
+                },
+                {
+                  title: "Club Meetups",
+                  desc: "Regular sessions with industry experts to share knowledge.",
+                },
+                {
+                  title: "Medical Insurance",
+                  desc: "Coverage of up to ₹2 lakh for our members.",
+                },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -471,7 +565,9 @@ const Home: React.FC = () => {
                   transition={{ delay: i * 0.2 }}
                   whileHover={{ y: -10 }}
                 >
-                  <h3 className="text-2xl font-bold text-primary uppercase">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-primary uppercase">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400 italic">{item.desc}</p>
                 </motion.div>
               ))}
@@ -480,7 +576,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 9. ENTERTAINMENT & REWARDS with Bounce Effect */}
-        <section id="rewards" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="rewards"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <motion.div
               className="space-y-8"
@@ -488,14 +587,16 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl md:text-6xl font-bold uppercase">ENTERTAINMENT & REWARDS</h2>
-              <p className="text-gray-400 text-xl leading-relaxed">By recognizing excellence, CLUB369 fosters a
-                culture of achievement, growth, and exclusive
-                opportunities for its members
-                High-achieving club members will enjoy exclusive
-                rewards, including domestic and international
-                travel, luxury resort accommodations, and
-                branded luxury gifts.</p>
+              <h2 className="text-4xl md:text-6xl font-bold uppercase">
+                ENTERTAINMENT & REWARDS
+              </h2>
+              <p className="text-gray-400 text-xl leading-relaxed">
+                By recognizing excellence, CLUB369 fosters a culture of
+                achievement, growth, and exclusive opportunities for its members
+                High-achieving club members will enjoy exclusive rewards,
+                including domestic and international travel, luxury resort
+                accommodations, and branded luxury gifts.
+              </p>
             </motion.div>
             <motion.div
               className="bg-primary/10 border border-primary/20 p-16 rounded-3xl text-center"
@@ -524,33 +625,167 @@ const Home: React.FC = () => {
         </section>
 
         {/* 10. OUR VENTURES */}
-        <section id="ventures" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="ventures"
+          className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
+              className="text-4xl md:text-6xl font-bold mb-8 uppercase text-center"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
             >
               OUR VENTURES
             </motion.h2>
-            <div className="grid md:grid-cols-3 gap-8 text-center">
+
+            <motion.p
+              className="text-gray-400 text-lg text-center max-w-3xl mx-auto mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              These are our existing ventures, and expanding them further is our
+              core objective. We focus on building scalable models backed by
+              strong strategy and execution. Through collective investment and
+              collaboration, we aim to create sustainable, high-impact
+              businesses.
+            </motion.p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { title: "Major Companies", desc: "Access to top franchise ventures investing with us." },
-                { title: "City-wide Launch", desc: "Launching across all major tier cities for accessibility." },
-                { title: "Jobs", desc: "Employment opportunities within our growing ventures." }
-              ].map((item, i) => (
+                {
+                  name: "CUEPHORIA",
+                  logo: cuephoriaLogo,
+                  subtitle: "8-Ball Club Combined with Gaming",
+                },
+                {
+                  name: "Aasife Biriyani",
+                  logo: aasifeBiriyaniLogo,
+                  subtitle: "Premium Biriyani Restaurant",
+                },
+                {
+                  name: "Bamboo Garden",
+                  logo: bambooGardenLogo,
+                  subtitle: "Natural Dining Experience",
+                },
+                {
+                  name: "TURF45",
+                  logo: turf45Logo,
+                  subtitle: "Football & Cricket Turf",
+                },
+                {
+                  name: "SPORTIC",
+                  logo: sporticLogo,
+                  subtitle: "A Sort App for Sports Enthusiasts",
+                },
+              ].map((venture, i) => (
                 <motion.div
                   key={i}
-                  className="p-8 border border-white/10 rounded-2xl"
+                  className="group p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{
+                    scale: 1.05,
+                    y: -5,
+                    borderColor: "rgba(139, 92, 246, 0.5)",
+                  }}
+                >
+                  <div className="aspect-video bg-white/10 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4">
+                    <motion.img
+                      src={venture.logo}
+                      alt={venture.name}
+                      className="w-full h-full object-contain"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                  <h3 className="text-lg font-bold mb-1 uppercase text-center">
+                    {venture.name}
+                  </h3>
+                  <p className="text-gray-400 text-sm text-center">
+                    {venture.subtitle}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 10.5 UPCOMING VENTURES - NEW SECTION */}
+        <section
+          id="upcoming-ventures"
+          className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden"
+        >
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.h2
+              className="text-4xl md:text-6xl font-bold mb-8 uppercase text-center"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              UPCOMING VENTURES
+            </motion.h2>
+
+            <motion.p
+              className="text-gray-400 text-lg text-center max-w-3xl mx-auto mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              Our upcoming ventures are focused on innovation, scalability, and
+              market relevance. Each initiative is designed to deliver long-term
+              value and sustainable growth.
+            </motion.p>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  name: "Unisex Salon",
+                  logo: unisexLogo,
+                },
+                { name: "Tea Shop", logo: teashopLogo },
+                { name: "Goat Farm", logo: goatfarmLogo },
+                {
+                  name: "Photography Studio",
+                  logo: photographyLogo,
+                },
+                {
+                  name: "Medical Store",
+                  logo: medicalLogo,
+                },
+                {
+                  name: "Fireworks Factory",
+                  logo: fireworksLogo,
+                },
+                {
+                  name: "Snooker & Sand Sports Club",
+                  logo: snookerLogo,
+                },
+              ].map((venture, i) => (
+                <motion.div
+                  key={i}
+                  className="group p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden hover:border-primary/50 transition-all"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ borderColor: "rgba(139, 92, 246, 0.5)", y: -5 }}
+                  transition={{ delay: i * 0.08 }}
+                  whileHover={{ scale: 1.05, y: -8 }}
                 >
-                  <h3 className="text-xl font-bold mb-4 uppercase">{item.title}</h3>
-                  <p className="text-gray-500">{item.desc}</p>
+                  <div className="aspect-square bg-white/10 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4">
+                    <motion.img
+                      src={venture.logo}
+                      alt={venture.name}
+                      className="w-full h-full object-contain"
+                      whileHover={{ scale: 1.15, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    />
+                  </div>
+                  <h3 className="text-base font-bold uppercase tracking-wide text-center">
+                    {venture.name}
+                  </h3>
                 </motion.div>
               ))}
             </div>
@@ -574,20 +809,20 @@ const Home: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              CLUB369 is designed with members in
-              mind, offering a seamless and intuitive
-              experience across all platforms. From easy
-              access to resources, live classes, and
-              venture opportunities, to personalized
-              guidance and real-time updates, every
-              interaction is crafted to maximize learning,
-              growth, and engagement
+              CLUB369 is designed with members in mind, offering a seamless and
+              intuitive experience across all platforms. From easy access to
+              resources, live classes, and venture opportunities, to
+              personalized guidance and real-time updates, every interaction is
+              crafted to maximize learning, growth, and engagement
             </motion.p>
           </div>
         </section>
 
         {/* 12. JOURNEY with Progressive Animation */}
-        <section id="journey" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="journey"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-5xl mx-auto px-6">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
@@ -599,9 +834,18 @@ const Home: React.FC = () => {
             </motion.h2>
             <div className="space-y-12">
               {[
-                { title: "Learning & Exploration", desc: "Begin your journey with CLUB369 by gaining foundational knowledge through live classes, digital resources, and expert guidance. Explore business strategies, trading insights, and digital marketing skills to build a strong base." },
-                { title: "Collaboration & Application", desc: "Apply your knowledge by collaborating with fellow members and engaging in practical business opportunities. Participate in club ventures, trading, and projects to gain hands-on experience and real world insights" },
-                { title: "Growth & Leadership", desc: "Reach the pinnacle by leading initiatives, mentoring new members, and expanding your own business ventures. CLUB369 empowers you to transform your skills into success, creating sustainable growth and recognition.." }
+                {
+                  title: "Learning & Exploration",
+                  desc: "Begin your journey with CLUB369 by gaining foundational knowledge through live classes, digital resources, and expert guidance. Explore business strategies, trading insights, and digital marketing skills to build a strong base.",
+                },
+                {
+                  title: "Collaboration & Application",
+                  desc: "Apply your knowledge by collaborating with fellow members and engaging in practical business opportunities. Participate in club ventures, trading, and projects to gain hands-on experience and real world insights",
+                },
+                {
+                  title: "Growth & Leadership",
+                  desc: "Reach the pinnacle by leading initiatives, mentoring new members, and expanding your own business ventures. CLUB369 empowers you to transform your skills into success, creating sustainable growth and recognition..",
+                },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -611,9 +855,14 @@ const Home: React.FC = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.2 }}
-                  whileHover={{ x: 10, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                  whileHover={{
+                    x: 10,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  }}
                 >
-                  <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
+                  <h3 className="text-xl font-bold uppercase mb-2">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400">{item.desc}</p>
                 </motion.div>
               ))}
@@ -634,8 +883,14 @@ const Home: React.FC = () => {
             </motion.h2>
             <div className="grid md:grid-cols-2 gap-8">
               {[
-                { title: "Global Expansion", desc: "We are constantly evolving, with plans to expand ventures, enhance learning programs, and introduce new opportunities for CLUB369 members." },
-                { title: "AI Tools", desc: "Incorporating AI-driven insights and analytics to guide members in business and trading decisions. CLUB369 plans to convert manual business strategies into AI-driven systems, enabling members to analyse efficiently with minimal manual intervention" }
+                {
+                  title: "Global Expansion",
+                  desc: "We are constantly evolving, with plans to expand ventures, enhance learning programs, and introduce new opportunities for CLUB369 members.",
+                },
+                {
+                  title: "AI Tools",
+                  desc: "Incorporating AI-driven insights and analytics to guide members in business and trading decisions. CLUB369 plans to convert manual business strategies into AI-driven systems, enabling members to analyse efficiently with minimal manual intervention",
+                },
               ].map((item, i) => (
                 <motion.div
                   key={i}
@@ -644,10 +899,15 @@ const Home: React.FC = () => {
                   whileInView={{ opacity: 1, rotateX: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.2 }}
-                  whileHover={{ scale: 1.02, borderColor: "rgba(139, 92, 246, 0.5)" }}
+                  whileHover={{
+                    scale: 1.02,
+                    borderColor: "rgba(139, 92, 246, 0.5)",
+                  }}
                   style={{ transformStyle: "preserve-3d" }}
                 >
-                  <h3 className="text-2xl font-bold text-primary mb-6 uppercase">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-6 uppercase">
+                    {item.title}
+                  </h3>
                   <p className="text-gray-400">{item.desc}</p>
                 </motion.div>
               ))}
@@ -656,7 +916,10 @@ const Home: React.FC = () => {
         </section>
 
         {/* 14. OUR PROJECTS with Grid Animation */}
-        <section id="projects" className="py-24 md:py-32 border-t border-white/5">
+        <section
+          id="projects"
+          className="py-24 md:py-32 border-t border-white/5"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
@@ -667,7 +930,12 @@ const Home: React.FC = () => {
               OUR PROJECTS
             </motion.h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {['Franchise Ventures', 'Digital Agency', 'E-commerce Hub', 'Trading Academy'].map((p, i) => (
+              {[
+                "Franchise Ventures",
+                "Digital Agency",
+                "E-commerce Hub",
+                "Trading Academy",
+              ].map((p, i) => (
                 <motion.div
                   key={i}
                   className="p-6 bg-white/5 border border-white/10 rounded-xl text-center uppercase text-sm font-bold tracking-widest text-gray-500"
@@ -675,7 +943,10 @@ const Home: React.FC = () => {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(139, 92, 246, 0.1)" }}
+                  whileHover={{
+                    scale: 1.1,
+                    backgroundColor: "rgba(139, 92, 246, 0.1)",
+                  }}
                 >
                   {p}
                 </motion.div>
@@ -704,7 +975,8 @@ const Home: React.FC = () => {
               repeatType: "reverse",
             }}
             style={{
-              backgroundImage: "radial-gradient(circle, black 1px, transparent 1px)",
+              backgroundImage:
+                "radial-gradient(circle, black 1px, transparent 1px)",
               backgroundSize: "50px 50px",
             }}
           />
@@ -725,7 +997,8 @@ const Home: React.FC = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              Join the exclusive community of 369 members and transform your entrepreneurial dreams into reality.
+              Join the exclusive community of 369 members and transform your
+              entrepreneurial dreams into reality.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
