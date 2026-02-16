@@ -3,7 +3,19 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import { Link } from "react-router-dom";
-import aboutImage from "../../../public/images/about.jpeg";
+import aboutImage from '../../../public/images/about-us.jpg';
+import cuephoriaLogo from '../../../public/images/ventures/cuephoria.png';
+import aasifeBiriyaniLogo from '../../../public/images/ventures/aasife.jpeg';
+import bambooGardenLogo from '../../../public/images/ventures/bamboo.png';
+import turf45Logo from '../../../public/images/ventures/turf-45.jpeg';
+import sporticLogo from '../../../public/images/ventures/sportic-logo.jpeg';
+import teashopLogo from '../../../public/images/ventures/tea-shop.jpeg';
+import unisexLogo from '../../../public/images/ventures/unisex.jpeg';
+import goatfarmLogo from '../../../public/images/ventures/goat-farm.jpeg';
+import photographyLogo from '../../../public/images/ventures/photography.jpeg';
+import medicalLogo from '../../../public/images/ventures/medical.jpeg';
+import fireworksLogo from '../../../public/images/ventures/fireworks.jpeg';
+import snookerLogo from '../../../public/images/ventures/snooker.jpeg';
 
 const Home: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -133,7 +145,7 @@ const Home: React.FC = () => {
                 ease: "easeInOut",
               }}
             >
-              Welcoming Today • Inspiring Tomorrow
+              Uniting Today • Inspiring Tomorrow
             </motion.span>
 
             <motion.h1
@@ -612,7 +624,7 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        {/* 10. OUR VENTURES - UPDATED */}
+        {/* 10. OUR VENTURES */}
         <section
           id="ventures"
           className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden"
@@ -644,28 +656,33 @@ const Home: React.FC = () => {
               {[
                 {
                   name: "CUEPHORIA",
+                  logo: cuephoriaLogo,
                   subtitle: "8-Ball Club Combined with Gaming",
-                  bg: "bg-gradient-to-br from-blue-600/20 to-purple-600/20",
                 },
                 {
                   name: "Aasife Biriyani",
+                  logo: aasifeBiriyaniLogo,
                   subtitle: "Premium Biriyani Restaurant",
-                  bg: "bg-gradient-to-br from-orange-600/20 to-red-600/20",
                 },
                 {
                   name: "Bamboo Garden",
+                  logo: bambooGardenLogo,
                   subtitle: "Natural Dining Experience",
-                  bg: "bg-gradient-to-br from-green-600/20 to-emerald-600/20",
                 },
                 {
                   name: "TURF45",
+                  logo: turf45Logo,
                   subtitle: "Football & Cricket Turf",
-                  bg: "bg-gradient-to-br from-lime-600/20 to-green-600/20",
+                },
+                {
+                  name: "SPORTIC",
+                  logo: sporticLogo,
+                  subtitle: "A Sort App for Sports Enthusiasts",
                 },
               ].map((venture, i) => (
                 <motion.div
                   key={i}
-                  className={`p-8 ${venture.bg} border border-white/10 rounded-2xl text-center backdrop-blur-sm`}
+                  className="group p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden"
                   initial={{ opacity: 0, scale: 0.8 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
@@ -676,10 +693,21 @@ const Home: React.FC = () => {
                     borderColor: "rgba(139, 92, 246, 0.5)",
                   }}
                 >
-                  <h3 className="text-xl font-bold mb-2 uppercase">
+                  <div className="aspect-video bg-white/10 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4">
+                    <motion.img
+                      src={venture.logo}
+                      alt={venture.name}
+                      className="w-full h-full object-contain"
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                  <h3 className="text-lg font-bold mb-1 uppercase text-center">
                     {venture.name}
                   </h3>
-                  <p className="text-gray-400 text-sm">{venture.subtitle}</p>
+                  <p className="text-gray-400 text-sm text-center">
+                    {venture.subtitle}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -716,57 +744,46 @@ const Home: React.FC = () => {
               {[
                 {
                   name: "Unisex Salon",
-                  icon: "✂️",
-                  color: "from-pink-500/20 to-purple-500/20",
+                  logo: unisexLogo,
                 },
-                {
-                  name: "Tea Shop",
-                  icon: "☕",
-                  color: "from-amber-500/20 to-orange-500/20",
-                },
-                {
-                  name: "Goat Farm",
-                  icon: "🐐",
-                  color: "from-green-500/20 to-emerald-500/20",
-                },
+                { name: "Tea Shop", logo: teashopLogo },
+                { name: "Goat Farm", logo: goatfarmLogo },
                 {
                   name: "Photography Studio",
-                  icon: "📸",
-                  color: "from-blue-500/20 to-cyan-500/20",
+                  logo: photographyLogo,
                 },
                 {
                   name: "Medical Store",
-                  icon: "💊",
-                  color: "from-red-500/20 to-pink-500/20",
+                  logo: medicalLogo,
                 },
                 {
                   name: "Fireworks Factory",
-                  icon: "🎆",
-                  color: "from-orange-500/20 to-yellow-500/20",
+                  logo: fireworksLogo,
                 },
                 {
                   name: "Snooker & Sand Sports Club",
-                  icon: "🎱",
-                  color: "from-indigo-500/20 to-purple-500/20",
+                  logo: snookerLogo,
                 },
               ].map((venture, i) => (
                 <motion.div
                   key={i}
-                  className={`p-8 bg-gradient-to-br ${venture.color} border border-white/10 rounded-2xl text-center backdrop-blur-sm hover:border-primary/50 transition-all`}
+                  className="group p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden hover:border-primary/50 transition-all"
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.08 }}
                   whileHover={{ scale: 1.05, y: -8 }}
                 >
-                  <motion.div
-                    className="text-5xl mb-4"
-                    whileHover={{ scale: 1.2, rotate: 10 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    {venture.icon}
-                  </motion.div>
-                  <h3 className="text-lg font-bold uppercase tracking-wide">
+                  <div className="aspect-square bg-white/10 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4">
+                    <motion.img
+                      src={venture.logo}
+                      alt={venture.name}
+                      className="w-full h-full object-contain"
+                      whileHover={{ scale: 1.15, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    />
+                  </div>
+                  <h3 className="text-base font-bold uppercase tracking-wide text-center">
                     {venture.name}
                   </h3>
                 </motion.div>
