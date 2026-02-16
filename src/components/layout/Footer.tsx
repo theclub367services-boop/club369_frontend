@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
               <span className="text-2xl font-bold tracking-widest text-white">CLUB369</span>
             </div>
             <p className="text-gray-500 max-w-xs mb-8 text-base uppercase tracking-tighter">
-              Welcoming Today • Inspiring Tomorrow
+              Uniting Today • Inspiring Tomorrow
             </p>
             <div className="flex gap-4">
               {/* Instagram */}
