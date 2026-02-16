@@ -51,7 +51,7 @@ export const PaymentService = {
             // 3. Setup Razorpay Options
             const rzpOptions = {
                 key: (process.env as any).REACT_APP_RAZORPAY_KEY_ID,
-                amount: 1,
+                amount: amount,
                 currency: currency,
                 name: "CLUB369",
                 description: "Membership Subscription",
