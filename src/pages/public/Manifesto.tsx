@@ -561,6 +561,7 @@ const Manifesto: React.FC = () => {
                             </motion.p>
 
                             <motion.button
+                                onClick={() => window.open('/')}
                                 className="bg-white text-black hover:bg-primary hover:text-white px-8 md:px-10 py-4 md:py-5 rounded-xl font-bold tracking-wide shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-[0_0_60px_rgba(175,37,244,0.6)] transition-all duration-300 text-base md:text-lg"
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
