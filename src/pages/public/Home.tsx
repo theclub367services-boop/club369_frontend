@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import { Link } from 'react-router-dom';
+import aboutImage from '../../../public/images/about.jpeg'
 
 const Home: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -238,7 +239,7 @@ const Home: React.FC = () => {
               className="relative rounded-2xl overflow-hidden border border-white/10 aspect-video md:aspect-square"
             >
               <motion.img
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2301&auto=format&fit=crop"
+                src={aboutImage}
                 alt="About US"
                 className="w-full h-full object-cover"
                 whileHover={{ scale: 1.1 }}

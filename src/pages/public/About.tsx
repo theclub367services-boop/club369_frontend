@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../../components/layout/Navbar';
 import Footer from '../../components/layout/Footer';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import missionImage from '../../../public/images/mission.jpeg'
+import visionImage from '../../../public/images/vision.jpeg'
 
 const About: React.FC = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -222,7 +224,7 @@ const About: React.FC = () => {
                                 whileHover={{ scale: 1.1 }}
                             />
                             <motion.img
-                                src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop"
+                                src={visionImage}
                                 className="w-full h-full object-cover opacity-60"
                                 alt="Vision"
                                 whileHover={{ scale: 1.1, opacity: 0.8 }}
@@ -294,7 +296,7 @@ const About: React.FC = () => {
                                 whileHover={{ scale: 1.1 }}
                             />
                             <motion.img
-                                src="https://images.unsplash.com/photo-1519681393798-3828fb40905f?q=80&w=2070&auto=format&fit=crop"
+                                src={missionImage}
                                 className="w-full h-full object-cover opacity-60"
                                 alt="Mission"
                                 whileHover={{ scale: 1.1, opacity: 0.8 }}
