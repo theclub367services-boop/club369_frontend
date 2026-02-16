@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import { Link } from "react-router-dom";
-import aboutImage from '../../../public/images/about-us.jpg';
+import aboutImage from '../../../public/images/about.jpg';
 import cuephoriaLogo from '../../../public/images/cuephoria.jpeg';
 import aasifeBiriyaniLogo from '../../../public/images/aasife.jpeg';
 import bambooGardenLogo from '../../../public/images/bamboo.jpeg';
