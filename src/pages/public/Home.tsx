@@ -3,19 +3,19 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import { Link } from "react-router-dom";
-import aboutImage from '../../../public/images/about.jpeg';
-import cuephoriaLogo from '../../../public/images/cuephoria.jpeg';
-import aasifeBiriyaniLogo from '../../../public/images/aasife.jpeg';
-import bambooGardenLogo from '../../../public/images/bamboo.jpeg';
-import turf45Logo from '../../../public/images/turf-45.jpeg';
-import sporticLogo from '../../../public/images/sportic-logo.jpeg';
-import teashopLogo from '../../../public/images/tea-shop.jpeg';
-import unisexLogo from '../../../public/images/unisex.jpeg';
-import goatfarmLogo from '../../../public/images/goat-farm.jpeg';
-import photographyLogo from '../../../public/images/photography.jpeg';
-import medicalLogo from '../../../public/images/medical.jpeg';
-import fireworksLogo from '../../../public/images/fireworks.jpeg';
-import snookerLogo from '../../../public/images/snooker.jpeg';
+import aboutImage from "../../../public/images/about.jpeg";
+import cuephoriaLogo from "../../../public/images/cuephoria.jpeg";
+import aasifeBiriyaniLogo from "../../../public/images/aasife.jpeg";
+import bambooGardenLogo from "../../../public/images/bamboo.jpeg";
+import turf45Logo from "../../../public/images/turf-45.jpeg";
+import sporticLogo from "../../../public/images/sportic-logo.jpeg";
+import teashopLogo from "../../../public/images/tea-shop.jpeg";
+import unisexLogo from "../../../public/images/unisex.jpeg";
+import goatfarmLogo from "../../../public/images/goat-farm.jpeg";
+import photographyLogo from "../../../public/images/photography.jpeg";
+import medicalLogo from "../../../public/images/medical.jpeg";
+import fireworksLogo from "../../../public/images/fireworks.jpeg";
+import snookerLogo from "../../../public/images/snooker.jpeg";
 
 const Home: React.FC = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -624,14 +624,14 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        {/* 10. OUR VENTURES */}
+        {/* 10. OUR VENTURES - MOBILE OPTIMIZED */}
         <section
           id="ventures"
-          className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden"
+          className="py-16 md:py-24 lg:py-32 border-t border-white/5 relative overflow-hidden"
         >
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-8 uppercase text-center"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-8 uppercase text-center"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -640,7 +640,7 @@ const Home: React.FC = () => {
             </motion.h2>
 
             <motion.p
-              className="text-gray-400 text-lg text-center max-w-3xl mx-auto mb-16"
+              className="text-gray-400 text-base sm:text-lg text-center max-w-3xl mx-auto mb-8 md:mb-12 lg:mb-16 px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -652,7 +652,7 @@ const Home: React.FC = () => {
               businesses.
             </motion.p>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
               {[
                 {
                   name: "CUEPHORIA",
@@ -682,30 +682,31 @@ const Home: React.FC = () => {
               ].map((venture, i) => (
                 <motion.div
                   key={i}
-                  className="group p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden"
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  className="group p-4 sm:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm overflow-hidden"
+                  initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: true, margin: "-50px" }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{
-                    scale: 1.05,
+                    scale: 1.03,
                     y: -5,
                     borderColor: "rgba(139, 92, 246, 0.5)",
                   }}
                 >
-                  <div className="aspect-video bg-white/10 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4">
+                  <div className="aspect-video bg-white/10 rounded-lg sm:rounded-xl mb-3 sm:mb-4 overflow-hidden flex items-center justify-center p-3 sm:p-4">
                     <motion.img
                       src={venture.logo}
                       alt={venture.name}
                       className="w-full h-full object-contain"
+                      loading="lazy"
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.3 }}
                     />
                   </div>
-                  <h3 className="text-lg font-bold mb-1 uppercase text-center">
+                  <h3 className="text-base sm:text-lg font-bold mb-1 uppercase text-center leading-tight">
                     {venture.name}
                   </h3>
-                  <p className="text-gray-400 text-sm text-center">
+                  <p className="text-gray-400 text-xs sm:text-sm text-center leading-relaxed">
                     {venture.subtitle}
                   </p>
                 </motion.div>
@@ -714,14 +715,14 @@ const Home: React.FC = () => {
           </div>
         </section>
 
-        {/* 10.5 UPCOMING VENTURES - NEW SECTION */}
+        {/* 10.5 UPCOMING VENTURES - MOBILE OPTIMIZED */}
         <section
           id="upcoming-ventures"
-          className="py-24 md:py-32 border-t border-white/5 relative overflow-hidden"
+          className="py-16 md:py-24 lg:py-32 border-t border-white/5 relative overflow-hidden"
         >
-          <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <motion.h2
-              className="text-4xl md:text-6xl font-bold mb-8 uppercase text-center"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-8 uppercase text-center"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -730,7 +731,7 @@ const Home: React.FC = () => {
             </motion.h2>
 
             <motion.p
-              className="text-gray-400 text-lg text-center max-w-3xl mx-auto mb-16"
+              className="text-gray-400 text-base sm:text-lg text-center max-w-3xl mx-auto mb-8 md:mb-12 lg:mb-16 px-4"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -740,7 +741,7 @@ const Home: React.FC = () => {
               value and sustainable growth.
             </motion.p>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-3 sm:gap-4 md:gap-6">
               {[
                 {
                   name: "Unisex Salon",
@@ -767,23 +768,24 @@ const Home: React.FC = () => {
               ].map((venture, i) => (
                 <motion.div
                   key={i}
-                  className="group p-6 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm overflow-hidden hover:border-primary/50 transition-all"
-                  initial={{ opacity: 0, y: 30 }}
+                  className="group p-3 sm:p-4 md:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm overflow-hidden hover:border-primary/50 transition-all"
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: true, margin: "-50px" }}
                   transition={{ delay: i * 0.08 }}
-                  whileHover={{ scale: 1.05, y: -8 }}
+                  whileHover={{ scale: 1.03, y: -5 }}
                 >
-                  <div className="aspect-square bg-white/10 rounded-xl mb-4 overflow-hidden flex items-center justify-center p-4">
+                  <div className="aspect-square bg-white/10 rounded-lg sm:rounded-xl mb-2 sm:mb-3 md:mb-4 overflow-hidden flex items-center justify-center p-2 sm:p-3 md:p-4">
                     <motion.img
                       src={venture.logo}
                       alt={venture.name}
                       className="w-full h-full object-contain"
-                      whileHover={{ scale: 1.15, rotate: 5 }}
+                      loading="lazy"
+                      whileHover={{ scale: 1.1, rotate: 3 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     />
                   </div>
-                  <h3 className="text-base font-bold uppercase tracking-wide text-center">
+                  <h3 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide text-center leading-tight px-1">
                     {venture.name}
                   </h3>
                 </motion.div>
