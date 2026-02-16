@@ -51,10 +51,10 @@ export const PaymentService = {
             // 3. Setup Razorpay Options
             const rzpOptions = {
                 key: (process.env as any).REACT_APP_RAZORPAY_KEY_ID,
-                amount: amount,
+                amount: 1,
                 currency: currency,
                 name: "CLUB369",
-                description: "Obsidian Monthly Subscription",
+                description: "Membership Subscription",
                 order_id: order_id,
                 prefill: options.prefill,
                 handler: async (response: any) => {
