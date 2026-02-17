@@ -39,7 +39,8 @@ instance.interceptors.response.use(
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
-            return axios.post('/api/auth/refresh/', {}, { withCredentials: true })
+            const baseURL = import.meta.env.VITE_API_BASE_URL || '';
+            return axios.post(`${baseURL}/api/auth/refresh/`, {}, { withCredentials: true })
                 .then(() => {
                     // Successfully refreshed, retry the original request
                     return instance(originalRequest);
