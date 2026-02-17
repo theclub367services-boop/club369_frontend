@@ -210,7 +210,7 @@ const Register: React.FC = () => {
                   edit
                 </span>
               </div>
-              <input
+              <motion.input
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
@@ -226,11 +226,16 @@ const Register: React.FC = () => {
             className="flex flex-col gap-4 relative z-10"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
+              <motion.div
+                className="space-y-1"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9 }}
+              >
                 <label className="text-xs font-bold text-gray-500 uppercase ml-1">
                   Full Name
                 </label>
-                <input
+                <motion.input
                   type="text"
                   name="name"
                   value={formData.name}
@@ -239,12 +244,17 @@ const Register: React.FC = () => {
                   className="w-full bg-[#0a0a0a]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:border-primary focus:outline-none transition-all"
                   required
                 />
-              </div>
-              <div className="space-y-1">
+              </motion.div>
+              <motion.div
+                className="space-y-1"
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9 }}
+              >
                 <label className="text-xs font-bold text-gray-500 uppercase ml-1">
                   Email Address
                 </label>
-                <input
+                <motion.input
                   type="email"
                   name="email"
                   value={formData.email}
@@ -253,14 +263,19 @@ const Register: React.FC = () => {
                   className="w-full bg-[#0a0a0a]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:border-primary focus:outline-none transition-all"
                   required
                 />
-              </div>
+              </motion.div>
             </div>
 
-            <div className="space-y-1">
+            <motion.div
+              className="space-y-1"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 }}
+            >
               <label className="text-xs font-bold text-gray-500 uppercase ml-1">
                 Phone Number
               </label>
-              <input
+              <motion.input
                 type="tel"
                 name="phone"
                 value={formData.phone}
@@ -269,7 +284,7 @@ const Register: React.FC = () => {
                 className="w-full bg-[#0a0a0a]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:border-primary focus:outline-none transition-all"
                 required
               />
-            </div>
+            </motion.div>
 
             <motion.div
               className="space-y-1"
