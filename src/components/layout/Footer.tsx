@@ -80,12 +80,11 @@ const Footer: React.FC = () => {
           <div className="col-span-1">
             <h4 className="font-bold text-white mb-6 uppercase tracking-wider">Explore</h4>
             <ul className="space-y-4 text-gray-500">
-              <li><Link to="/#about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link to="/#why369" className="hover:text-primary transition-colors">Why 369?</Link></li>
-              <li><Link to="/#vision" className="hover:text-primary transition-colors">Our Vision</Link></li>
-              <li><Link to="/#networking" className="hover:text-primary transition-colors">Networking</Link></li>
-              <li><Link to="/#trading" className="hover:text-primary transition-colors">Trading</Link></li>
-              <li><Link to="/#expansion" className="hover:text-primary transition-colors">Expansion</Link></li>
+              <li><Link to="https://theclub369.com/#/about" className="hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link to="https://theclub369.com/#/manifesto" className="hover:text-primary transition-colors">Why 369?</Link></li>
+              <li><Link to="https://theclub369.com/#/#vision" className="hover:text-primary transition-colors">Our Vision</Link></li>
+              <li><Link to="https://theclub369.com/#/#trading" className="hover:text-primary transition-colors">Trading</Link></li>
+              <li><Link to="https://theclub369.com/#/contact" className="hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>
 
