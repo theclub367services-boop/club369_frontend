@@ -116,7 +116,7 @@ const Navbar: React.FC = () => {
               <Link to="/contact" className="text-lg font-medium hover:text-primary" onClick={() => setMobileOpen(false)}>Contact</Link>
               <hr className="border-white/10 my-2" />
               {!isAuthenticated ? (
-                <Link to="/login" className="text-lg font-bold hover:text-primary" onClick={() => setMobileOpen(false)}>Member Login</Link>
+                <Link to="/login" className="text-lg font-bold hover:text-primary" onClick={() => setMobileOpen(false)}>Login</Link>
               ) : (
                 <div className="flex flex-col gap-4">
                   <button
