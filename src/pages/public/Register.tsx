@@ -271,29 +271,46 @@ const Register: React.FC = () => {
               />
             </div>
 
-            <div className="space-y-1">
+            <motion.div
+              className="space-y-1"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.9 }}
+            >
               <label className="text-xs font-bold text-gray-500 uppercase ml-1">
                 Create Password
               </label>
-              <motion.input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
-                className="w-full bg-[#0a0a0a]/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:border-primary focus:outline-none transition-all"
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors focus:outline-none"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {showPassword ? "visibility_off" : "visibility"}
-                </span>
-              </button>
-            </div>
+              <div className="relative group/input">
+                <motion.div
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within/input:text-primary transition-colors"
+                  whileHover={{ scale: 1.2, rotate: 360 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    lock
+                  </span>
+                </motion.div>
+                <motion.input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full bg-[#0a0a0a]/50 border border-white/10 rounded-xl py-3.5 pl-12 pr-12 text-white placeholder:text-white/20 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+                  required
+                  whileFocus={{ scale: 1.01 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors focus:outline-none"
+                >
+                  <span className="material-symbols-outlined text-[20px]">
+                    {showPassword ? "visibility_off" : "visibility"}
+                  </span>
+                </button>
+              </div>
+            </motion.div>
             <div className="text-xs text-gray-500">
               Note : Please upload your profile picture to register without any
               Errors. Dont Miss it.
