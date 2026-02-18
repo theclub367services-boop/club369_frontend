@@ -64,10 +64,6 @@ const Navbar: React.FC = () => {
             Why 369?
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
           </Link>
-          <button onClick={() => handleAnchorClick('trading')} className="text-sm font-medium hover:text-primary transition-colors tracking-wide relative group">
-            Trading
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
-          </button>
           <button onClick={() => handleAnchorClick('ventures')} className="text-sm font-medium hover:text-primary transition-colors tracking-wide relative group">
             Ventures
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
@@ -111,7 +107,6 @@ const Navbar: React.FC = () => {
               <Link to="/" className="text-lg font-medium hover:text-primary" onClick={() => setMobileOpen(false)}>Home</Link>
               <Link to="/about" className="text-lg font-medium hover:text-primary" onClick={() => setMobileOpen(false)}>About Us</Link>
               <Link to="/manifesto" className="text-lg font-medium hover:text-primary" onClick={() => setMobileOpen(false)}>Why 369?</Link>
-              <button onClick={() => handleAnchorClick('trading')} className="text-lg font-medium hover:text-primary text-left">Trading</button>
               <button onClick={() => handleAnchorClick('ventures')} className="text-lg font-medium hover:text-primary text-left">Ventures</button>
               <Link to="/contact" className="text-lg font-medium hover:text-primary" onClick={() => setMobileOpen(false)}>Contact</Link>
               <hr className="border-white/10 my-2" />
