@@ -164,7 +164,7 @@ const Checkout: React.FC = () => {
                 {
                   icon: "health_and_safety",
                   title: "Medical Coverage",
-                  desc: "Health insurance up to ₹2 Lakh.",
+                  desc: "Health insurance for your health will be covered.",
                 },
               ].map((item, i) => (
                 <motion.div
