@@ -15,24 +15,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [state, setState] = useState<AuthState>({
         user: AuthService.getCurrentUser(),
         isAuthenticated: !!AuthService.getCurrentUser(),
-        isLoading: !!AuthService.getCurrentUser(), // Set to true if we need to refresh
+        isLoading: true, // Always start in loading state for rehydration check
     });
 
     const refreshUser = async () => {
         try {
             const user = await AuthService.getMe();
-            setState(prev => ({
-                ...prev,
+            setState({
                 user,
                 isAuthenticated: true,
                 isLoading: false,
-            }));
+            });
         } catch (error) {
-            console.error("Failed to refresh user:", error);
+            console.error("Auth rehydration failed:", error);
+            // If check fails, we stop loading and clear state
+            setState({
+                user: null,
+                isAuthenticated: false,
+                isLoading: false,
+            });
+
+            // If it's a 401, clear the local storage "user" hint
             if ((error as any).status === 401) {
-                logout();
-            } else {
-                setState(prev => ({ ...prev, isLoading: false }));
+                localStorage.removeItem('user');
             }
         }
     };
@@ -89,10 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
-        console.log('AuthContext State:', { isAuthenticated: state.isAuthenticated, isLoading: state.isLoading, userRole: state.user?.role });
-        if (state.isAuthenticated) {
-            refreshUser();
-        }
+        // Perform silent authentication check on every app load
+        refreshUser();
     }, []);
 
     return (
