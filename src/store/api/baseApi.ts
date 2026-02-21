@@ -1,7 +1,10 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
+const isDev = import.meta.env.DEV;
+const baseUrl = import.meta.env.VITE_API_BASE_URL || (isDev ? 'http://localhost:8000' : 'https://api.theclub369.com');
+
 const baseQuery = fetchBaseQuery({
-    baseUrl: '/api',
+    baseUrl: `${baseUrl}/api`,
     credentials: 'include',
 });
 

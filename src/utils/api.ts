@@ -8,8 +8,11 @@ interface StandardizedResponse<T> {
     errors?: any;
 }
 
+const isDev = import.meta.env.DEV;
+const baseUrl = import.meta.env.VITE_API_BASE_URL || (isDev ? 'http://localhost:8000' : 'https://api.theclub369.com');
+
 const instance = axios.create({
-    baseURL: (import.meta.env.VITE_API_BASE_URL || '') + '/api',
+    baseURL: `${baseUrl}/api`,
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
