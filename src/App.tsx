@@ -35,7 +35,7 @@ const ProtectedRoute = ({ children, role }: { children: React.ReactNode; role?: 
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (role && user?.role?.toLowerCase() !== role.toLowerCase()) {
