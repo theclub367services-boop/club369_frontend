@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
@@ -17,13 +17,14 @@ import medicalLogo from "../../../public/images/medical.jpeg";
 import fireworksLogo from "../../../public/images/fireworks.jpeg";
 import snookerLogo from "../../../public/images/snooker.jpeg";
 
-// Reusable fade-up variant — defined once, used everywhere
+const APPLE_EASE = [0.25, 0.1, 0.25, 1] as const;
+
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 22 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut", delay },
+    transition: { duration: 0.55, ease: APPLE_EASE, delay },
   }),
 };
 
@@ -31,61 +32,100 @@ const fadeIn = {
   hidden: { opacity: 0 },
   visible: (delay = 0) => ({
     opacity: 1,
-    transition: { duration: 0.5, ease: "easeOut", delay },
+    transition: { duration: 0.55, ease: APPLE_EASE, delay },
   }),
 };
 
-const Home: React.FC = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Throttled mouse handler — only updates every ~60ms
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    setMousePosition({
+const Section: React.FC<{
+  id: string;
+  className?: string;
+  children: React.ReactNode;
+}> = ({ id, className = "", children }) => (
+  <section
+    id={id}
+    className={`py-24 md:py-32 border-t border-white/5 ${className}`}
+    style={{ contain: "layout style paint" }}
+  >
+    {children}
+  </section>
+);
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
+const Home: React.FC = () => {
+  // Refs instead of state — writing to a ref never triggers React re-renders.
+  const blobRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number>(0);
+  const mouse = useRef({ x: 0, y: 0 });
+
+  // Store raw mouse delta — no state update, no render.
+  const onMouseMove = useCallback((e: MouseEvent) => {
+    mouse.current = {
       x: (e.clientX - window.innerWidth / 2) / 80,
       y: (e.clientY - window.innerHeight / 2) / 80,
-    });
+    };
   }, []);
 
   useEffect(() => {
-    let rafId: number;
-    const throttled = (e: MouseEvent) => {
-      cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => handleMouseMove(e));
+    const tick = () => {
+      if (blobRef.current) {
+        const { x, y } = mouse.current;
+        blobRef.current.style.transform = `translate3d(calc(-50% + ${x * 36}px), calc(-50% + ${y * 36}px), 0)`;
+      }
+      rafRef.current = requestAnimationFrame(tick);
     };
-    window.addEventListener("mousemove", throttled, { passive: true });
+    rafRef.current = requestAnimationFrame(tick);
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+
     return () => {
-      window.removeEventListener("mousemove", throttled);
-      cancelAnimationFrame(rafId);
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("mousemove", onMouseMove);
     };
-  }, [handleMouseMove]);
+  }, [onMouseMove]);
 
   return (
     <div className="relative min-h-screen text-white selection:bg-primary selection:text-white flex flex-col overflow-hidden">
       <Navbar />
 
-      {/* Simplified static background — no heavy scroll-based transforms */}
-      <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden>
-        <div className="absolute top-[-10%] left-[-10%] w-[55vw] h-[55vw] bg-primary/5 rounded-full blur-[120px]" />
-        <div className="absolute top-[25%] right-[5%] w-[35vw] h-[35vw] bg-purple-900/8 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[-5%] right-[-5%] w-[45vw] h-[45vw] bg-purple-900/8 rounded-full blur-[140px]" />
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        aria-hidden
+        style={{ willChange: "transform" }}
+      >
+        <div
+          className="absolute top-[-10%] left-[-10%] w-[55vw] h-[55vw] bg-primary/5 rounded-full blur-[120px]"
+          style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+        />
+        <div
+          className="absolute top-[25%] right-[5%] w-[35vw] h-[35vw] bg-purple-900/8 rounded-full blur-[100px]"
+          style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+        />
+        <div
+          className="absolute bottom-[-5%] right-[-5%] w-[45vw] h-[45vw] bg-purple-900/8 rounded-full blur-[140px]"
+          style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+        />
       </div>
 
       <main className="relative z-10 flex-grow">
-        {/* ─── 1. HERO ──────────────────────────────────────────────── */}
+        {/* ─── 1. HERO ──────────────────────────────────────────────────── */}
         <section
           id="hero"
           className="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 relative"
+          style={{ contain: "layout style" }}
         >
-          {/* Subtle mouse-parallax blob — single element, cheap transform */}
+
           <div
-            className="absolute inset-0 pointer-events-none"
+            ref={blobRef}
+            aria-hidden
+            className="absolute top-1/2 left-1/2 w-[480px] h-[480px] bg-primary/5 rounded-full blur-[110px] pointer-events-none"
             style={{
-              transform: `translate(${mousePosition.x * 1.5}px, ${mousePosition.y * 1.5}px)`,
-              transition: "transform 0.1s linear",
+              transform: "translate3d(-50%, -50%, 0)",
+              willChange: "transform",
+              backfaceVisibility: "hidden",
             }}
-          >
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/4 rounded-full blur-3xl" />
-          </div>
+          />
 
           <motion.div
             initial="hidden"
@@ -102,8 +142,9 @@ const Home: React.FC = () => {
 
             <motion.h1
               variants={fadeUp}
-              custom={0.15}
+              custom={0.12}
               className="text-6xl md:text-9xl font-bold tracking-tighter leading-[0.9] mb-8 uppercase"
+              style={{ willChange: "opacity, transform" }}
             >
               <span className="block text-white">WELCOME TO</span>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-white via-primary to-white animate-gradient bg-[length:200%_auto]">
@@ -113,7 +154,7 @@ const Home: React.FC = () => {
 
             <motion.p
               variants={fadeUp}
-              custom={0.25}
+              custom={0.22}
               className="text-gray-400 text-lg md:text-xl max-w-xl mb-10"
             >
               An exclusive educational community where knowledge becomes your
@@ -122,51 +163,61 @@ const Home: React.FC = () => {
 
             <motion.div
               variants={fadeUp}
-              custom={0.35}
+              custom={0.3}
               className="flex flex-col sm:flex-row gap-4 md:gap-6 w-full max-w-md justify-center"
             >
+
               <Link
-                to="/payment"
-                className="group w-full sm:w-auto overflow-hidden rounded-lg bg-white px-8 md:px-10 py-4 text-black transition-all hover:bg-gray-200 text-center uppercase font-bold text-lg hover:scale-105"
+                to="/login"
+                className="w-full sm:w-auto overflow-hidden rounded-lg bg-white px-8 md:px-10 py-4 text-black text-center uppercase font-bold text-lg
+                  transition-all duration-200 ease-out
+                  hover:bg-gray-100 hover:-translate-y-0.5
+                  active:scale-[0.98] active:translate-y-0"
+                style={{ willChange: "transform" }}
               >
                 Join The Club
               </Link>
               <Link
                 to="/manifesto"
-                className="w-full sm:w-auto px-8 md:px-10 py-4 border border-white/20 rounded-lg text-white font-bold text-lg uppercase tracking-wide hover:bg-white/5 transition-all text-center hover:scale-105"
+                className="w-full sm:w-auto px-8 md:px-10 py-4 border border-white/20 rounded-lg text-white font-bold text-lg uppercase tracking-wide text-center
+                  transition-all duration-200 ease-out
+                  hover:bg-white/5 hover:-translate-y-0.5
+                  active:scale-[0.98] active:translate-y-0"
+                style={{ willChange: "transform" }}
               >
                 Read Manifesto
               </Link>
             </motion.div>
           </motion.div>
 
-          {/* Scroll indicator */}
-          <div className="absolute bottom-10 flex flex-col items-center gap-1 opacity-40">
+          {/* Scroll indicator — single translateY loop, stays on GPU */}
+          <div
+            className="absolute bottom-10 flex flex-col items-center gap-1 opacity-40"
+            aria-hidden
+          >
             <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
               <motion.div
                 className="w-1 h-2 bg-white rounded-full mt-2"
-                animate={{ y: [0, 16, 0] }}
+                animate={{ y: [0, 14, 0] }}
                 transition={{
-                  duration: 2,
+                  duration: 1.8,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
+                style={{ willChange: "transform" }}
               />
             </div>
           </div>
         </section>
 
-        {/* ─── 2. ABOUT US ──────────────────────────────────────────── */}
-        <section
-          id="about"
-          className="py-24 md:py-32 relative border-t border-white/5"
-        >
+        {/* ─── 2. ABOUT US ──────────────────────────────────────────────── */}
+        <Section id="about">
           <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
             <motion.div
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="space-y-8"
             >
               <h2 className="text-5xl md:text-7xl font-bold tracking-tight uppercase">
@@ -184,7 +235,7 @@ const Home: React.FC = () => {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
-                    custom={i * 0.1}
+                    custom={i * 0.08}
                   >
                     {text}
                   </motion.p>
@@ -193,29 +244,33 @@ const Home: React.FC = () => {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.55, ease: APPLE_EASE }}
               className="relative rounded-2xl overflow-hidden border border-white/10 aspect-video md:aspect-square"
+              style={{ willChange: "opacity, transform" }}
             >
               <img
                 src={aboutImage}
                 alt="About CLUB369"
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                className="w-full h-full object-cover transition-transform duration-500 ease-out hover:scale-[1.04]"
+                style={{ willChange: "transform" }}
+                loading="eager"
+                decoding="async"
               />
             </motion.div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 3. WHY 369? ──────────────────────────────────────────── */}
-        <section id="why369" className="py-24 md:py-32 border-t border-white/5">
+        {/* ─── 3. WHY 369? ──────────────────────────────────────────────── */}
+        <Section id="why369">
           <div className="max-w-7xl mx-auto px-6 text-center mb-16">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-4 uppercase"
             >
               WHY 369?
@@ -225,7 +280,7 @@ const Home: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.2}
+              custom={0.15}
               className="text-primary text-xl font-light italic uppercase tracking-widest"
             >
               An exclusive learning circle of only 369 members
@@ -237,7 +292,7 @@ const Home: React.FC = () => {
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="space-y-6 text-gray-400 text-lg leading-relaxed"
             >
               {[
@@ -251,7 +306,7 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.12}
+                  custom={i * 0.1}
                 >
                   {text}
                 </motion.p>
@@ -259,35 +314,45 @@ const Home: React.FC = () => {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.6 }}
+              initial={{ opacity: 0, scale: 0.7 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, type: "spring", stiffness: 120 }}
-              className="bg-white/5 border border-white/10 p-12 rounded-full aspect-square flex items-center justify-center hover:border-primary/40 transition-colors duration-300"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{
+                duration: 0.55,
+                type: "spring",
+                stiffness: 130,
+                damping: 18,
+              }}
+              className="bg-white/5 border border-white/10 p-12 rounded-full aspect-square flex items-center justify-center
+                transition-colors duration-300 hover:border-primary/40"
+              style={{ willChange: "opacity, transform" }}
             >
-              <span className="text-8xl font-bold text-primary">369</span>
+              <span className="text-8xl font-bold text-primary select-none">
+                369
+              </span>
             </motion.div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 4. OUR VISION ────────────────────────────────────────── */}
-        <section id="vision" className="py-24 md:py-32 border-t border-white/5">
+        {/* ─── 4. OUR VISION ────────────────────────────────────────────── */}
+        <Section id="vision">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-12 uppercase"
             >
               OUR VISION
             </motion.h2>
             <motion.div
-              initial={{ opacity: 0, y: 32 }}
+              initial={{ opacity: 0, y: 28 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-white/5 p-12 rounded-3xl border border-white/10 backdrop-blur-sm hover:border-primary/30 transition-colors duration-300"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.55, ease: APPLE_EASE }}
+              className="bg-white/5 p-12 rounded-3xl border border-white/10 backdrop-blur-sm
+                transition-colors duration-300 hover:border-primary/30"
             >
               <p className="text-2xl md:text-4xl font-light italic text-gray-300">
                 "We aim to cultivate a generation of knowledgeable, skilled, and
@@ -296,19 +361,16 @@ const Home: React.FC = () => {
               </p>
             </motion.div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 5. LEARNING & NETWORKING ─────────────────────────────── */}
-        <section
-          id="networking"
-          className="py-24 md:py-32 border-t border-white/5"
-        >
+        {/* ─── 5. LEARNING & NETWORKING ─────────────────────────────────── */}
+        <Section id="networking">
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center md:text-left"
             >
               LEARNING & NETWORKING
@@ -330,8 +392,11 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.15}
-                  className="p-10 bg-white/5 border border-white/10 rounded-2xl hover:border-primary/40 hover:-translate-y-2 transition-all duration-300"
+                  custom={i * 0.12}
+                  className="p-10 bg-white/5 border border-white/10 rounded-2xl
+                    transition-all duration-300 ease-out
+                    hover:border-primary/40 hover:-translate-y-1.5"
+                  style={{ willChange: "transform" }}
                 >
                   <h3 className="text-2xl font-bold text-primary mb-4 uppercase">
                     {item.title}
@@ -341,19 +406,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 6. KNOWLEDGE PILLARS ─────────────────────────────────── */}
-        <section
-          id="knowledge"
-          className="py-24 md:py-32 border-t border-white/5"
-        >
+        {/* ─── 6. KNOWLEDGE PILLARS ─────────────────────────────────────── */}
+        <Section id="knowledge">
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase"
             >
               KNOWLEDGE PILLARS
@@ -379,8 +441,11 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.12}
-                  className="p-8 bg-white/5 border border-white/10 rounded-2xl hover:border-primary/50 hover:scale-[1.03] transition-all duration-300"
+                  custom={i * 0.1}
+                  className="p-8 bg-white/5 border border-white/10 rounded-2xl
+                    transition-all duration-300 ease-out
+                    hover:border-primary/50 hover:-translate-y-1"
+                  style={{ willChange: "transform" }}
                 >
                   <h3 className="text-xl font-bold mb-4 uppercase">
                     {item.title}
@@ -390,16 +455,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 7. SKILL DEVELOPMENT ─────────────────────────────────── */}
-        <section id="skills" className="py-24 md:py-32 border-t border-white/5">
+        {/* ─── 7. SKILL DEVELOPMENT ─────────────────────────────────────── */}
+        <Section id="skills">
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center md:text-right"
             >
               SKILL DEVELOPMENT
@@ -426,7 +491,10 @@ const Home: React.FC = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   custom={i * 0.1}
-                  className="p-8 border border-white/10 rounded-2xl hover:bg-white/5 hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300"
+                  className="p-8 border border-white/10 rounded-2xl
+                    transition-all duration-300 ease-out
+                    hover:bg-white/5 hover:-translate-y-1"
+                  style={{ willChange: "transform" }}
                 >
                   <h3 className="text-xl font-bold text-primary mb-4 uppercase">
                     {item.title}
@@ -436,19 +504,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 8. MEMBER BENEFITS ───────────────────────────────────── */}
-        <section
-          id="opportunities"
-          className="py-24 md:py-32 border-t border-white/5"
-        >
+        {/* ─── 8. MEMBER BENEFITS ───────────────────────────────────────── */}
+        <Section id="opportunities">
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
             >
               MEMBER BENEFITS
@@ -474,8 +539,9 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.15}
-                  className="space-y-4 hover:-translate-y-2 transition-transform duration-300"
+                  custom={i * 0.12}
+                  className="space-y-4 transition-transform duration-300 ease-out hover:-translate-y-1.5"
+                  style={{ willChange: "transform" }}
                 >
                   <h3 className="text-2xl font-bold text-primary uppercase">
                     {item.title}
@@ -485,19 +551,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 9. ACHIEVEMENTS & REWARDS ────────────────────────────── */}
-        <section
-          id="rewards"
-          className="py-24 md:py-32 border-t border-white/5"
-        >
+        {/* ─── 9. ACHIEVEMENTS & REWARDS ────────────────────────────────── */}
+        <Section id="rewards">
           <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
             <motion.div
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="space-y-8"
             >
               <h2 className="text-4xl md:text-6xl font-bold uppercase">
@@ -512,32 +575,34 @@ const Home: React.FC = () => {
               </p>
             </motion.div>
 
+            {/* Entry uses opacity+y only — no scale jank */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.7 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="bg-primary/10 border border-primary/20 p-16 rounded-3xl text-center hover:scale-105 transition-transform duration-300"
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, ease: APPLE_EASE }}
+              className="bg-primary/10 border border-primary/20 p-16 rounded-3xl text-center
+                transition-transform duration-300 ease-out hover:-translate-y-1"
+              style={{ willChange: "transform" }}
             >
-              <span className="text-6xl">🏆</span>
+              <span className="text-6xl" role="img" aria-label="Trophy">
+                🏆
+              </span>
               <p className="text-2xl font-bold mt-6 uppercase">
                 Elite Achievers
               </p>
             </motion.div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 10. OUR VENTURES ─────────────────────────────────────── */}
-        <section
-          id="ventures"
-          className="py-16 md:py-24 lg:py-32 border-t border-white/5"
-        >
+        {/* ─── 10. OUR VENTURES ─────────────────────────────────────────── */}
+        <Section id="ventures">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-8 uppercase text-center"
             >
               OUR VENTURES
@@ -548,7 +613,7 @@ const Home: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.1}
+              custom={0.08}
               className="text-gray-400 text-base sm:text-lg text-center max-w-3xl mx-auto mb-8 md:mb-12 lg:mb-16 px-4"
             >
               These real-world ventures serve as live case studies for our
@@ -591,15 +656,24 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-40px" }}
-                  custom={i * 0.08}
-                  className="group p-4 sm:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm hover:border-primary/50 hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300"
+                  custom={i * 0.07}
+                  className="group p-4 sm:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm flex flex-col items-center
+                    transition-all duration-300 ease-out
+                    hover:border-primary/50 hover:-translate-y-1"
+                  style={{ willChange: "transform" }}
                 >
-                  <div className="aspect-video bg-white/10 rounded-lg sm:rounded-xl mb-3 sm:mb-4 overflow-hidden flex items-center justify-center p-3 sm:p-4">
+                  {/* Circular logo — uniform size, object-cover fills evenly */}
+                  <div
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white overflow-hidden flex-shrink-0 mb-4 shadow-md ring-2 ring-white/10
+                    transition-all duration-300 ease-out group-hover:ring-primary/40"
+                  >
                     <img
                       src={venture.logo}
                       alt={venture.name}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                      style={{ willChange: "transform" }}
                       loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <h3 className="text-base sm:text-lg font-bold mb-1 uppercase text-center leading-tight">
@@ -612,19 +686,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 10.5 UPCOMING VENTURES ───────────────────────────────── */}
-        <section
-          id="upcoming-ventures"
-          className="py-16 md:py-24 lg:py-32 border-t border-white/5"
-        >
+        {/* ─── 10.5 UPCOMING VENTURES ───────────────────────────────────── */}
+        <Section id="upcoming-ventures">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-8 uppercase text-center"
             >
               UPCOMING VENTURES
@@ -635,7 +706,7 @@ const Home: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.1}
+              custom={0.08}
               className="text-gray-400 text-base sm:text-lg text-center max-w-3xl mx-auto mb-8 md:mb-12 lg:mb-16 px-4"
             >
               Our upcoming ventures are designed with educational value in mind
@@ -659,15 +730,20 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-40px" }}
-                  custom={i * 0.07}
-                  className="group p-3 sm:p-4 md:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm hover:border-primary/50 hover:scale-[1.03] hover:-translate-y-1 transition-all duration-300"
+                  custom={i * 0.06}
+                  className="group p-3 sm:p-4 md:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm
+                    transition-all duration-300 ease-out
+                    hover:border-primary/50 hover:-translate-y-1"
+                  style={{ willChange: "transform" }}
                 >
                   <div className="aspect-square bg-white/10 rounded-lg sm:rounded-xl mb-2 sm:mb-3 md:mb-4 overflow-hidden flex items-center justify-center p-2 sm:p-3 md:p-4">
                     <img
                       src={venture.logo}
                       alt={venture.name}
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain transition-transform duration-300 ease-out group-hover:scale-105"
+                      style={{ willChange: "transform" }}
                       loading="lazy"
+                      decoding="async"
                     />
                   </div>
                   <h3 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide text-center leading-tight px-1">
@@ -677,16 +753,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 11. LEARNING EXPERIENCE ──────────────────────────────── */}
-        <section id="ux" className="py-24 md:py-32 border-t border-white/5">
+        {/* ─── 11. LEARNING EXPERIENCE ──────────────────────────────────── */}
+        <Section id="ux">
           <div className="max-w-4xl mx-auto px-6 text-center">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-12 uppercase"
             >
               LEARNING EXPERIENCE
@@ -696,7 +772,7 @@ const Home: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.15}
+              custom={0.12}
               className="text-2xl text-gray-400 font-light leading-relaxed"
             >
               CLUB369 is designed with learners in mind — offering a seamless
@@ -706,19 +782,16 @@ const Home: React.FC = () => {
               crafted to maximise knowledge, growth, and engagement.
             </motion.p>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 12. LEARNING JOURNEY ─────────────────────────────────── */}
-        <section
-          id="journey"
-          className="py-24 md:py-32 border-t border-white/5"
-        >
+        {/* ─── 12. LEARNING JOURNEY ─────────────────────────────────────── */}
+        <Section id="journey">
           <div className="max-w-5xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
             >
               YOUR LEARNING JOURNEY
@@ -744,9 +817,11 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.15}
-                  className="p-8 border-l-4 border-primary bg-white/5 hover:bg-white/8 hover:translate-x-2 transition-all duration-300"
-                  style={{ marginLeft: `${i * 2}rem` }}
+                  custom={i * 0.12}
+                  className="p-8 border-l-4 border-primary bg-white/5
+                    transition-all duration-300 ease-out
+                    hover:bg-white/[0.08] hover:translate-x-1.5"
+                  style={{ marginLeft: `${i * 2}rem`, willChange: "transform" }}
                 >
                   <h3 className="text-xl font-bold uppercase mb-2">
                     {item.title}
@@ -756,16 +831,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 13. FUTURE DEVELOPMENTS ──────────────────────────────── */}
-        <section id="future" className="py-24 md:py-32 border-t border-white/5">
+        {/* ─── 13. FUTURE DEVELOPMENTS ──────────────────────────────────── */}
+        <Section id="future">
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
             >
               FUTURE DEVELOPMENTS
@@ -787,8 +862,11 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.2}
-                  className="p-12 bg-white/5 border border-white/10 rounded-3xl hover:border-primary/40 hover:scale-[1.02] transition-all duration-300"
+                  custom={i * 0.15}
+                  className="p-12 bg-white/5 border border-white/10 rounded-3xl
+                    transition-all duration-300 ease-out
+                    hover:border-primary/40 hover:-translate-y-1"
+                  style={{ willChange: "transform" }}
                 >
                   <h3 className="text-2xl font-bold text-primary mb-6 uppercase">
                     {item.title}
@@ -798,19 +876,16 @@ const Home: React.FC = () => {
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 14. OUR PROGRAMS ─────────────────────────────────────── */}
-        <section
-          id="projects"
-          className="py-24 md:py-32 border-t border-white/5"
-        >
+        {/* ─── 14. OUR PROGRAMS ─────────────────────────────────────────── */}
+        <Section id="projects">
           <div className="max-w-7xl mx-auto px-6">
             <motion.h2
               variants={fadeUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-80px" }}
               className="text-4xl md:text-6xl font-bold mb-16 uppercase text-center"
             >
               OUR PROGRAMS
@@ -828,27 +903,32 @@ const Home: React.FC = () => {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  custom={i * 0.1}
-                  className="p-6 bg-white/5 border border-white/10 rounded-xl text-center uppercase text-sm font-bold tracking-widest text-gray-500 hover:bg-primary/10 hover:text-primary hover:border-primary/40 hover:scale-105 transition-all duration-300"
+                  custom={i * 0.08}
+                  className="p-6 bg-white/5 border border-white/10 rounded-xl text-center uppercase text-sm font-bold tracking-widest text-gray-500
+                    transition-all duration-200 ease-out
+                    hover:bg-primary/10 hover:text-primary hover:border-primary/40 hover:-translate-y-0.5"
+                  style={{ willChange: "transform" }}
                 >
                   {p}
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
+        </Section>
 
-        {/* ─── 15. CTA ──────────────────────────────────────────────── */}
+        {/* ─── 15. CTA ──────────────────────────────────────────────────── */}
         <motion.section
           id="contact-summary"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, ease: APPLE_EASE }}
           className="py-24 md:py-32 bg-primary text-black relative overflow-hidden"
+          style={{ contain: "layout style paint" }}
         >
-          {/* Lightweight dot pattern — CSS only */}
+          {/* Pure CSS dot pattern — zero JS, zero animation, zero GPU cost */}
           <div
+            aria-hidden
             className="absolute inset-0 opacity-10"
             style={{
               backgroundImage:
@@ -872,7 +952,7 @@ const Home: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.15}
+              custom={0.12}
               className="text-xl md:text-2xl mb-12 opacity-80"
             >
               Join the exclusive community of 369 learners and transform your
@@ -883,11 +963,14 @@ const Home: React.FC = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              custom={0.3}
+              custom={0.22}
             >
               <Link
                 to="/contact"
-                className="inline-block bg-black text-white px-12 py-5 rounded-full font-bold uppercase tracking-widest hover:scale-105 transition-transform text-lg shadow-2xl"
+                className="inline-block bg-black text-white px-12 py-5 rounded-full font-bold uppercase tracking-widest text-lg shadow-2xl
+                  transition-transform duration-200 ease-out
+                  hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+                style={{ willChange: "transform" }}
               >
                 Get In Touch
               </Link>
