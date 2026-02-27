@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   HashRouter,
   Routes,
@@ -41,13 +41,11 @@ const ProtectedRoute = ({
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
 
-  // While auth is resolving, show nothing (LoadingScreen handles the overlay)
+  // While auth is resolving, render nothing — LoadingScreen covers the gap
   if (isLoading) return null;
 
-  // Not logged in → go to home page (Guest-friendly landing)
   if (!isAuthenticated) return <Navigate to="/" replace />;
 
-  // Wrong role → redirect to the right home
   if (role && user?.role?.toLowerCase() !== role.toLowerCase()) {
     return user?.role?.toUpperCase() === "ADMIN" ? (
       <Navigate to="/admin" replace />
@@ -89,22 +87,43 @@ import { useHeartbeat } from "./hooks/useHeartbeat";
 
 const AppRoutes = () => {
   const location = useLocation();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuth();
 
   useHeartbeat(300000);
 
-  // Global loading state:
-  // true  = auth hasn't resolved yet (first paint)
-  // false = auth resolved, show content
   const [appReady, setAppReady] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  // Track previous value without causing re-renders
+  const prevLoading = useRef<boolean>(true); // boot starts as true
 
   useEffect(() => {
-    if (!authLoading) {
-      // Small buffer so the progress bar has time to reach 100% smoothly
-      const t = setTimeout(() => setAppReady(true), 300);
+    const was = prevLoading.current;
+    prevLoading.current = authLoading;
+
+    // ── BOOT phase ──
+    if (!appReady) {
+      if (!authLoading) {
+        // First authLoading→false: boot complete
+        const t = setTimeout(() => setAppReady(true), 300);
+        return () => clearTimeout(t);
+      }
+      return; // still booting, do nothing else
+    }
+
+    // ── POST-BOOT: action tracking ──
+    if (!was && authLoading) {
+      // false → true: user action started (login, register…)
+      setActionLoading(true);
+    }
+
+    if (was && !authLoading) {
+      // true → false: action resolved, short settle buffer
+      const t = setTimeout(() => setActionLoading(false), 380);
       return () => clearTimeout(t);
     }
-  }, [authLoading]);
+  }, [authLoading, appReady]);
+
+  const showLoader = !appReady || actionLoading;
 
   const isDashboardOrAdmin =
     location.pathname.startsWith("/dashboard") ||
@@ -114,15 +133,20 @@ const AppRoutes = () => {
     <>
       <ScrollToTop />
 
-      {/* Loading overlay — exits once auth + initial data is ready */}
-      <LoadingScreen isLoading={!appReady} />
+      {/*
+        LoadingScreen is visible during:
+        ① Initial boot  — session rehydration via getMe()
+        ② Login action  — bridges blank gap while ProtectedRoute returns null
+        ③ Register      — same gap coverage
+      */}
+      <LoadingScreen isLoading={showLoader} />
 
-      {/* Brand Background Layer (Public/Marketing only) */}
+      {/* Brand background — public/marketing pages only */}
       {!isDashboardOrAdmin && <FixedBackground />}
 
       <div className="relative z-[2]">
         <Routes>
-          {/* Public Routes */}
+          {/* Public */}
           <Route
             path="/"
             element={
@@ -172,13 +196,13 @@ const AppRoutes = () => {
             }
           />
 
-          {/* Password Reset (public, no auth check) */}
+          {/* Password reset — no auth guard */}
           <Route
             path="/password-reset/:uid/:token"
             element={<PasswordReset />}
           />
 
-          {/* User Flow Routes */}
+          {/* Checkout */}
           <Route
             path="/payment"
             element={
@@ -188,7 +212,7 @@ const AppRoutes = () => {
             }
           />
 
-          {/* Secure Routes */}
+          {/* Secure */}
           <Route
             path="/dashboard/*"
             element={
