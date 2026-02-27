@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   HashRouter,
   Routes,
@@ -41,11 +41,13 @@ const ProtectedRoute = ({
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
 
-  // While auth is resolving, render nothing — LoadingScreen covers the gap
+  // While auth is resolving, show nothing (LoadingScreen handles the overlay)
   if (isLoading) return null;
 
+  // Not logged in → go to home page (Guest-friendly landing)
   if (!isAuthenticated) return <Navigate to="/" replace />;
 
+  // Wrong role → redirect to the right home
   if (role && user?.role?.toLowerCase() !== role.toLowerCase()) {
     return user?.role?.toUpperCase() === "ADMIN" ? (
       <Navigate to="/admin" replace />
@@ -57,9 +59,11 @@ const ProtectedRoute = ({
   if (
     user?.role?.toUpperCase() === "USER" &&
     user?.status === "PENDING" &&
-    window.location.hash !== "#/payment"
+    // window.location.hash !== "#/payment"
+    window.location.hash !== "#/dashboard"
   ) {
-    return <Navigate to="/payment" replace />;
+    return <Navigate to="/dashboard" replace />;
+    // return <Navigate to="/payment" replace />;
   }
 
   return <>{children}</>;
@@ -87,43 +91,22 @@ import { useHeartbeat } from "./hooks/useHeartbeat";
 
 const AppRoutes = () => {
   const location = useLocation();
-  const { isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useHeartbeat(300000);
 
+  // Global loading state:
+  // true  = auth hasn't resolved yet (first paint)
+  // false = auth resolved, show content
   const [appReady, setAppReady] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  // Track previous value without causing re-renders
-  const prevLoading = useRef<boolean>(true); // boot starts as true
 
   useEffect(() => {
-    const was = prevLoading.current;
-    prevLoading.current = authLoading;
-
-    // ── BOOT phase ──
-    if (!appReady) {
-      if (!authLoading) {
-        // First authLoading→false: boot complete
-        const t = setTimeout(() => setAppReady(true), 300);
-        return () => clearTimeout(t);
-      }
-      return; // still booting, do nothing else
-    }
-
-    // ── POST-BOOT: action tracking ──
-    if (!was && authLoading) {
-      // false → true: user action started (login, register…)
-      setActionLoading(true);
-    }
-
-    if (was && !authLoading) {
-      // true → false: action resolved, short settle buffer
-      const t = setTimeout(() => setActionLoading(false), 380);
+    if (!authLoading) {
+      // Small buffer so the progress bar has time to reach 100% smoothly
+      const t = setTimeout(() => setAppReady(true), 300);
       return () => clearTimeout(t);
     }
-  }, [authLoading, appReady]);
-
-  const showLoader = !appReady || actionLoading;
+  }, [authLoading]);
 
   const isDashboardOrAdmin =
     location.pathname.startsWith("/dashboard") ||
@@ -133,20 +116,15 @@ const AppRoutes = () => {
     <>
       <ScrollToTop />
 
-      {/*
-        LoadingScreen is visible during:
-        ① Initial boot  — session rehydration via getMe()
-        ② Login action  — bridges blank gap while ProtectedRoute returns null
-        ③ Register      — same gap coverage
-      */}
-      <LoadingScreen isLoading={showLoader} />
+      {/* Loading overlay — exits once auth + initial data is ready */}
+      <LoadingScreen isLoading={!appReady} />
 
-      {/* Brand background — public/marketing pages only */}
+      {/* Brand Background Layer (Public/Marketing only) */}
       {!isDashboardOrAdmin && <FixedBackground />}
 
       <div className="relative z-[2]">
         <Routes>
-          {/* Public */}
+          {/* Public Routes */}
           <Route
             path="/"
             element={
@@ -196,13 +174,13 @@ const AppRoutes = () => {
             }
           />
 
-          {/* Password reset — no auth guard */}
+          {/* Password Reset (public, no auth check) */}
           <Route
             path="/password-reset/:uid/:token"
             element={<PasswordReset />}
           />
 
-          {/* Checkout */}
+          {/* User Flow Routes */}
           <Route
             path="/payment"
             element={
@@ -212,7 +190,7 @@ const AppRoutes = () => {
             }
           />
 
-          {/* Secure */}
+          {/* Secure Routes */}
           <Route
             path="/dashboard/*"
             element={
