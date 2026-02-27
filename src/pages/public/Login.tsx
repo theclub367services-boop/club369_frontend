@@ -104,7 +104,8 @@ const Login: React.FC = () => {
       if (user?.role?.toLowerCase() === "admin") {
         navigate("/admin");
       } else if (user?.status === "PENDING") {
-        navigate("/payment");
+        // navigate("/payment");
+        navigate("/dashboard");
       } else {
         navigate("/dashboard");
       }
