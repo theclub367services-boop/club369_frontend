@@ -527,17 +527,16 @@ const Dashboard: React.FC = () => {
                 {user?.name || "Member"}.
               </span>
             </h2>
-            <p
+            {/* <p
               className="text-gray-400 text-sm flex items-center gap-2
                           [-webkit-font-smoothing:antialiased]"
             >
-              {/* Pulse dot — single element, cheap */}
               <span
                 className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
                 style={{ transform: "translateZ(0)" }}
               />
               Member ID: {user?.id ? String(user.id).slice(0, 8) : "N/A"}
-            </p>
+            </p> */}
           </div>
         </div>
 
