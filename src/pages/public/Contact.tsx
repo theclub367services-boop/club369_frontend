@@ -267,7 +267,7 @@ const Contact: React.FC = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-green opacity-75" />
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-accent-green" />
                 </span>
-                48 – 72 Hours
+                12 – 16 Hours
               </div>
             </motion.div>
           </Block>

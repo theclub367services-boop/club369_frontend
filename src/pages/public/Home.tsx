@@ -36,7 +36,6 @@ const fadeIn = {
   }),
 };
 
-
 const Section: React.FC<{
   id: string;
   className?: string;
@@ -115,7 +114,6 @@ const Home: React.FC = () => {
           className="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 relative"
           style={{ contain: "layout style" }}
         >
-
           <div
             ref={blobRef}
             aria-hidden
@@ -166,7 +164,6 @@ const Home: React.FC = () => {
               custom={0.3}
               className="flex flex-col sm:flex-row gap-4 md:gap-6 w-full max-w-md justify-center"
             >
-
               <Link
                 to="/login"
                 className="w-full sm:w-auto overflow-hidden rounded-lg bg-white px-8 md:px-10 py-4 text-black text-center uppercase font-bold text-lg
@@ -518,19 +515,17 @@ const Home: React.FC = () => {
             >
               MEMBER BENEFITS
             </motion.h2>
-            <div className="grid md:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto">
               {[
                 {
                   title: "Club Access",
                   desc: "Full access to all learning modules, live sessions, and current and future educational resources.",
+                  icon: "🎓",
                 },
                 {
                   title: "Expert Meetups",
                   desc: "Regular interactive sessions with industry experts, educators, and successful entrepreneurs.",
-                },
-                {
-                  title: "Medical Insurance",
-                  desc: "Health coverage of up to ₹2 lakh for every registered club member.",
+                  icon: "🤝",
                 },
               ].map((item, i) => (
                 <motion.div
@@ -540,13 +535,18 @@ const Home: React.FC = () => {
                   whileInView="visible"
                   viewport={{ once: true }}
                   custom={i * 0.12}
-                  className="space-y-4 transition-transform duration-300 ease-out hover:-translate-y-1.5"
+                  className="p-8 bg-white/5 border border-white/10 rounded-2xl flex flex-col gap-4
+            transition-all duration-300 ease-out
+            hover:border-primary/40 hover:-translate-y-1.5"
                   style={{ willChange: "transform" }}
                 >
+                  <span className="text-3xl">{item.icon}</span>
                   <h3 className="text-2xl font-bold text-primary uppercase">
                     {item.title}
                   </h3>
-                  <p className="text-gray-400 italic">{item.desc}</p>
+                  <p className="text-gray-400 italic leading-relaxed">
+                    {item.desc}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -714,13 +714,14 @@ const Home: React.FC = () => {
               learn its operations, and contribute to its launch and growth.
             </motion.p>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-3 sm:gap-4 md:gap-6">
+            {/* Flex wrap — cards stay centered regardless of count */}
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
               {[
                 { name: "Unisex Salon", logo: unisexLogo },
                 { name: "Tea Shop", logo: teashopLogo },
                 { name: "Goat Farm", logo: goatfarmLogo },
                 { name: "Photography Studio", logo: photographyLogo },
-                { name: "Medical Store", logo: medicalLogo },
+                // { name: "Medical Store", logo: medicalLogo },
                 { name: "Fireworks Factory", logo: fireworksLogo },
                 { name: "Snooker & Sand Sports Club", logo: snookerLogo },
               ].map((venture, i) => (
@@ -731,12 +732,13 @@ const Home: React.FC = () => {
                   whileInView="visible"
                   viewport={{ once: true, margin: "-40px" }}
                   custom={i * 0.06}
-                  className="group p-3 sm:p-4 md:p-6 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm
-                    transition-all duration-300 ease-out
-                    hover:border-primary/50 hover:-translate-y-1"
+                  className="group w-[calc(50%-6px)] sm:w-36 md:w-40 lg:w-44
+            p-3 sm:p-4 md:p-5 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl backdrop-blur-sm
+            transition-all duration-300 ease-out
+            hover:border-primary/50 hover:-translate-y-1"
                   style={{ willChange: "transform" }}
                 >
-                  <div className="aspect-square bg-white/10 rounded-lg sm:rounded-xl mb-2 sm:mb-3 md:mb-4 overflow-hidden flex items-center justify-center p-2 sm:p-3 md:p-4">
+                  <div className="aspect-square bg-white/10 rounded-lg sm:rounded-xl mb-2 sm:mb-3 overflow-hidden flex items-center justify-center p-2 sm:p-3 md:p-4">
                     <img
                       src={venture.logo}
                       alt={venture.name}
@@ -746,7 +748,7 @@ const Home: React.FC = () => {
                       decoding="async"
                     />
                   </div>
-                  <h3 className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide text-center leading-tight px-1">
+                  <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wide text-center leading-tight px-1">
                     {venture.name}
                   </h3>
                 </motion.div>

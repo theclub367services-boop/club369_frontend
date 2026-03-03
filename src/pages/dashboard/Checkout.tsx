@@ -38,11 +38,11 @@ const BENEFITS = [
     title: "Expert-Led Sessions",
     desc: "Regular live classes and mentorship meetups.",
   },
-  {
-    icon: "health_and_safety",
-    title: "Medical Coverage",
-    desc: "Health insurance for your health will be covered.",
-  },
+  // {
+  //   icon: "health_and_safety",
+  //   title: "Medical Coverage",
+  //   desc: "Health insurance for your health will be covered.",
+  // },
 ];
 
 // ─── 3D Tilt Card ─────────────────────────────────────────────────────────────
