@@ -35,16 +35,7 @@ const fadeUp = {
 };
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { label: "Overview", path: "/dashboard", icon: "grid_view" },
-  { label: "Profile", path: "/dashboard/profile", icon: "account_circle" },
-  {
-    label: "Vouchers",
-    path: "/dashboard/vouchers",
-    icon: "confirmation_number",
-  },
-  { label: "Payments", path: "/dashboard/payments", icon: "payments" },
-];
+// Removed static NAV_ITEMS to use dynamic navItems based on user status
 
 // ─── Vault items ──────────────────────────────────────────────────────────────
 const VAULT_ITEMS = [
@@ -167,11 +158,10 @@ const Overview: React.FC<{
               <span
                 className={`px-2 py-0.5 text-[10px] font-bold border rounded-full uppercase
                                [-webkit-font-smoothing:antialiased]
-                               ${
-                                 details?.status === "ACTIVE"
-                                   ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                   : "bg-red-500/10 text-red-500 border-red-500/20"
-                               }`}
+                               ${details?.status === "ACTIVE"
+                    ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                    : "bg-red-500/10 text-red-500 border-red-500/20"
+                  }`}
               >
                 {details?.status || "INACTIVE"}
               </span>
@@ -185,26 +175,26 @@ const Overview: React.FC<{
               Next Billing
             </div>
             <div className="text-xl font-bold [-webkit-font-smoothing:antialiased]">
-               {details?.nextBillingDate ? new Date(details.nextBillingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+              {details?.nextBillingDate ? new Date(details.nextBillingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
             </div>
           </div>
         </div>
 
-                <div className="space-y-4 relative z-10">
-                    <div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
-                        <span className="text-gray-400">Cycle Progress</span>
-                        <span className="text-primary">{daysRemaining} Days Left</span>
-                    </div>
-                    <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 mb-6">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressPercent}%` }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-primary via-purple-500 to-blue-500"
-                        />
-                    </div>
+        <div className="space-y-4 relative z-10">
+          <div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
+            <span className="text-gray-400">Cycle Progress</span>
+            <span className="text-primary">{daysRemaining} Days Left</span>
+          </div>
+          <div className="h-3 bg-white/5 rounded-full overflow-hidden border border-white/5 mb-6">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              className="h-full bg-gradient-to-r from-primary via-purple-500 to-blue-500"
+            />
+          </div>
 
-                    {/* <RenewButton
+          {/* <RenewButton
                         status={details?.status || 'none'}
                         expiryDate={details?.expiryDate || ''}
                         amount={4999}
@@ -212,8 +202,8 @@ const Overview: React.FC<{
                         name={user?.name || ''}
                         mobile={user?.mobile || ''}
                     /> */}
-                </div>
-            </motion.div>
+        </div>
+      </motion.div>
 
       {/* Contact card */}
       <motion.a
@@ -411,11 +401,10 @@ const TransactionLedger: React.FC<{ transactions: any[] }> = ({
                   <span
                     className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase
                                    [-webkit-font-smoothing:antialiased]
-                                   ${
-                                     txn.status === "success"
-                                       ? "bg-emerald-500/10 text-emerald-500"
-                                       : "bg-red-500/10 text-red-500"
-                                   }`}
+                                   ${txn.status === "success"
+                        ? "bg-emerald-500/10 text-emerald-500"
+                        : "bg-red-500/10 text-red-500"
+                      }`}
                   >
                     {txn.status === "success" ? "PAID" : txn.status}
                   </span>
@@ -469,20 +458,20 @@ const Dashboard: React.FC = () => {
     );
   }
 
-    const today = new Date();
-    const expiry = details ? new Date(details.expiryDate) : today;
-    const daysRemaining = Math.max(0, Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
-    const totalCycleDays = 30;
-    const progressPercent = details ? Math.min(100, ((totalCycleDays - daysRemaining) / totalCycleDays) * 100) : 0;
+  const today = new Date();
+  const expiry = details ? new Date(details.expiryDate) : today;
+  const daysRemaining = Math.max(0, Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
+  const totalCycleDays = 30;
+  const progressPercent = details ? Math.min(100, ((totalCycleDays - daysRemaining) / totalCycleDays) * 100) : 0;
 
-    const isUserInactive = user?.status === 'PENDING' || details?.status === 'INACTIVE';
+  const isUserInactive = user?.status === 'PENDING' || details?.status === 'INACTIVE';
 
-    const navItems = [
-        { label: 'Overview', path: '/dashboard', icon: 'grid_view' },
-        { label: 'Profile', path: '/dashboard/profile', icon: 'account_circle' },
-        ...(!isUserInactive ? [{ label: 'Vouchers', path: '/dashboard/vouchers', icon: 'confirmation_number' }] : []),
-        { label: 'Payments', path: '/dashboard/payments', icon: 'payments' },
-    ];
+  const navItems = [
+    { label: 'Overview', path: '/dashboard', icon: 'grid_view' },
+    { label: 'Profile', path: '/dashboard/profile', icon: 'account_circle' },
+    ...(!isUserInactive ? [{ label: 'Vouchers', path: '/dashboard/vouchers', icon: 'confirmation_number' }] : []),
+    { label: 'Payments', path: '/dashboard/payments', icon: 'payments' },
+  ];
 
   return (
     <DashboardLayout>
@@ -564,7 +553,7 @@ const Dashboard: React.FC = () => {
 
       {/* ── Sub-nav ── */}
       <nav className="flex gap-1 mb-10 overflow-x-auto pb-2 scrollbar-hide">
-        {NAV_ITEMS.map((item, i) => {
+        {navItems.map((item, i) => {
           const active = location.pathname === item.path;
           return (
             <motion.div
@@ -578,11 +567,10 @@ const Dashboard: React.FC = () => {
                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold
                             uppercase tracking-widest transition-colors duration-200
                             [-webkit-font-smoothing:antialiased]
-                            ${
-                              active
-                                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white border border-white/5"
-                            }`}
+                            ${active
+                    ? "bg-primary text-white shadow-lg shadow-primary/20"
+                    : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white border border-white/5"
+                  }`}
               >
                 <span className="material-symbols-outlined text-[18px]">
                   {item.icon}
@@ -618,17 +606,19 @@ const Dashboard: React.FC = () => {
               }
             />
             <Route path="profile" element={<Profile />} />
-            <Route
-              path="vouchers"
-              element={
-                <Vouchers
-                  user={user}
-                  membershipStatus={details?.status || "INACTIVE"}
-                  vouchers={vouchers}
-                  onClaim={claimVoucher}
-                />
-              }
-            />
+            {!isUserInactive && (
+              <Route
+                path="vouchers"
+                element={
+                  <Vouchers
+                    user={user}
+                    membershipStatus={details?.status || "INACTIVE"}
+                    vouchers={vouchers}
+                    onClaim={claimVoucher}
+                  />
+                }
+              />
+            )}
             <Route
               path="payments"
               element={<TransactionLedger transactions={transactions} />}
