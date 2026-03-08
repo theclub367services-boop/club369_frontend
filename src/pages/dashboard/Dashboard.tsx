@@ -20,6 +20,8 @@ import RenewButton from "../../components/membership/RenewButton";
 import VoucherCard from "../../components/vouchers/VoucherCard";
 import { getFullUrl } from "../../utils/url";
 import { formatDate } from "../../utils/date";
+import { PaymentService } from "../../services/PaymentService";
+import LoadingScreen from "../../components/layout/Loadingscreen";
 
 // ─── Apple-tuned constants ────────────────────────────────────────────────────
 const APPLE_EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -123,7 +125,10 @@ const Overview: React.FC<{
   transactions: any[];
   daysRemaining: number;
   progressPercent: number;
-}> = ({ user, details, daysRemaining, progressPercent }) => (
+  onEnableAutoPay: () => void;
+  onCancelAutoPay: () => void;
+  setIsPaymentLoading: (loading: boolean) => void;
+}> = ({ user, details, daysRemaining, progressPercent, onEnableAutoPay, onCancelAutoPay, setIsPaymentLoading }) => (
   <div className="space-y-12">
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Subscription card */}
@@ -175,7 +180,7 @@ const Overview: React.FC<{
               Next Billing
             </div>
             <div className="text-xl font-bold [-webkit-font-smoothing:antialiased]">
-              {details?.nextBillingDate ? new Date(details.nextBillingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
+              {details?.status === 'EXPIRED' ? 'N/A' : details?.nextBillingDate ? new Date(details.nextBillingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
             </div>
           </div>
         </div>
@@ -194,14 +199,55 @@ const Overview: React.FC<{
             />
           </div>
 
-          {/* <RenewButton
-                        status={details?.status || 'none'}
-                        expiryDate={details?.expiryDate || ''}
-                        amount={4999}
-                        email={user?.email || ''}
-                        name={user?.name || ''}
-                        mobile={user?.mobile || ''}
-                    /> */}
+          {details?.autopayStatus === 'active' ? (
+            <div className="pt-4 border-t border-white/5 space-y-3">
+              <div className="flex justify-between items-center bg-primary/10 px-4 py-2 rounded-lg border border-primary/20">
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">AutoPay Active</span>
+                <button
+                  onClick={onCancelAutoPay}
+                  className="text-[10px] uppercase font-bold text-red-400 hover:text-red-300 transition-colors"
+                >
+                  Cancel AutoPay
+                </button>
+              </div>
+              <p className="text-[10px] text-gray-500 text-center uppercase tracking-widest">Manual renewals disabled</p>
+            </div>
+          ) : (
+            <div className="pt-4 border-t border-white/5 space-y-3">
+              <div className="relative w-full">
+                {details?.status !== 'ACTIVE' && (
+                  <span className="text-xs font-bold text-primary uppercase tracking-wider">choose any one option (AutoPay or Manual Renewal)</span>
+                )}
+                <button
+                  onClick={onEnableAutoPay}
+                  disabled={details?.status === 'ACTIVE'}
+                  className={`peer w-full py-3 rounded-xl border text-xs tracking-widest uppercase font-bold transition-all flex items-center justify-center gap-2
+                    ${details?.status === 'ACTIVE'
+                      ? 'bg-gray-500/10 border-white/5 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-primary/20 to-purple-500/20 text-primary border-primary/30 hover:from-primary/30 hover:to-purple-500/30'
+                    }`}
+                >
+                  <span className="material-symbols-outlined text-sm">autorenew</span>
+                  Enable AutoPay
+                </button>
+                {details?.status === 'ACTIVE' && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-black border border-white/10 rounded-lg text-[10px] text-gray-400 opacity-0 peer-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                    Try enabling next membership payment. You can't enable it in the middle of an active membership.
+                  </div>
+                )}
+              </div>
+
+              <RenewButton
+                status={details?.status || 'INACTIVE'}
+                expiryDate={details?.expiryDate || ''}
+                amount={4999}
+                email={user?.email || ''}
+                name={user?.name || ''}
+                mobile={user?.mobile || ''}
+                setIsPaymentLoading={setIsPaymentLoading}
+              />
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -367,10 +413,10 @@ const TransactionLedger: React.FC<{ transactions: any[] }> = ({
         <table className="w-full text-left">
           <thead>
             <tr className="bg-white/5 text-[10px] uppercase font-bold text-gray-500 tracking-widest">
-              {["Billing Date", "Reference", "Amount", "Status"].map((h, i) => (
+              {["Billing Date", "Amount", "Status"].map((h, i) => (
                 <th
                   key={i}
-                  className={`p-5 [-webkit-font-smoothing:antialiased] ${i === 3 ? "text-right" : ""}`}
+                  className={`p-5 [-webkit-font-smoothing:antialiased] ${i === 2 ? "text-right" : ""}`}
                 >
                   {h}
                 </th>
@@ -390,9 +436,6 @@ const TransactionLedger: React.FC<{ transactions: any[] }> = ({
               >
                 <td className="p-5 text-gray-400 [-webkit-font-smoothing:antialiased]">
                   {formatDate(txn.date)}
-                </td>
-                <td className="p-5 font-mono text-xs [-webkit-font-smoothing:antialiased]">
-                  {txn.id}
                 </td>
                 <td className="p-5 font-bold [-webkit-font-smoothing:antialiased]">
                   ₹ {txn.amount.toLocaleString()}
@@ -423,8 +466,58 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { details, vouchers, transactions, isLoading, claimVoucher } =
+  const { details, vouchers, transactions, isLoading, claimVoucher, enableAutoPay, cancelAutoPay } =
     useMembership();
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+
+  const handleEnableAutoPay = useCallback(async () => {
+    setIsPaymentLoading(true);
+    try {
+      const res = await enableAutoPay();
+      // Since api.ts strips the outer response and returns .data, we just need to check if subscription_id exists
+      if (res && res.subscription_id) {
+        PaymentService.handleAutoPay(res.subscription_id, res.key_id, {
+          onSuccess: () => {
+            alert("AutoPay enabled successfully!");
+            window.location.reload();
+          },
+          onDismiss: () => {
+            alert("Payment process was cancelled.");
+            setIsPaymentLoading(false);
+            window.location.reload();
+          },
+          onError: (error) => {
+            alert("Error setting up AutoPay: " + (error.description || error.message || String(error)));
+            setIsPaymentLoading(false);
+          },
+          prefill: {
+            name: user?.name,
+            email: user?.email,
+            contact: user?.mobile,
+          }
+        });
+      } else {
+        setIsPaymentLoading(false);
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Failed to start AutoPay setup.");
+      setIsPaymentLoading(false);
+    }
+  }, [enableAutoPay, user]);
+
+  const handleCancelAutoPay = useCallback(async () => {
+    if (window.confirm("Are you sure you want to cancel your AutoPay subscription? This will stop automatic future renewals.")) {
+      setIsPaymentLoading(true);
+      try {
+        await cancelAutoPay();
+        alert("AutoPay subscription cancelled.");
+        window.location.reload();
+      } catch (err: any) {
+        alert(err.response?.data?.error || "Failed to cancel AutoPay.");
+        setIsPaymentLoading(false);
+      }
+    }
+  }, [cancelAutoPay]);
 
   const handleLogout = useCallback(async () => {
     if (window.confirm("Are you sure you want to logout?")) {
@@ -460,11 +553,12 @@ const Dashboard: React.FC = () => {
 
   const today = new Date();
   const expiry = details ? new Date(details.expiryDate) : today;
+  const start = details?.startDate ? new Date(details.startDate) : new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
   const daysRemaining = Math.max(0, Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
-  const totalCycleDays = 30;
+  const totalCycleDays = Math.max(1, Math.ceil((expiry.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
   const progressPercent = details ? Math.min(100, ((totalCycleDays - daysRemaining) / totalCycleDays) * 100) : 0;
 
-  const isUserInactive = user?.status === 'PENDING' || details?.status === 'INACTIVE';
+  const isUserInactive = user?.status === 'PENDING' || details?.status === 'INACTIVE' || details?.status === 'EXPIRED';
 
   const navItems = [
     { label: 'Overview', path: '/dashboard', icon: 'grid_view' },
@@ -474,51 +568,58 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout>
-      {/* ── Header ── */}
-      <motion.header
-        className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-6"
-        initial={{ opacity: 0, y: -18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: APPLE_EASE }}
-      >
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", ...APPLE_SPRING, delay: 0.08 }}
-            className="w-12 h-12 rounded-full border-2 border-primary/20 overflow-hidden
+    <>
+      <LoadingScreen
+        isLoading={isPaymentLoading}
+        label="Processing Payment..."
+        fadeIn={true}
+        showDots={true}
+      />
+      <DashboardLayout>
+        {/* ── Header ── */}
+        <motion.header
+          className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-6"
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: APPLE_EASE }}
+        >
+          <div className="flex items-center gap-4">
+            {/* Avatar */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", ...APPLE_SPRING, delay: 0.08 }}
+              className="w-12 h-12 rounded-full border-2 border-primary/20 overflow-hidden
                        bg-primary/10 flex items-center justify-center shrink-0
                        will-change-transform"
-            style={{ translateZ: 0 } as React.CSSProperties}
-          >
-            {user?.profile_picture ? (
-              <img
-                src={getFullUrl(user.profile_picture) || ""}
-                alt={user.name}
-                className="w-full h-full object-cover"
-                loading="eager"
-                decoding="async"
-              />
-            ) : (
-              <span className="material-symbols-outlined text-2xl text-primary/40">
-                person
-              </span>
-            )}
-          </motion.div>
-
-          <div className="space-y-1">
-            <h2
-              className="text-3xl font-black tracking-tight text-white
-                           [-webkit-font-smoothing:antialiased]"
+              style={{ translateZ: 0 } as React.CSSProperties}
             >
-              Welcome back,{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
-                {user?.name || "Member"}.
-              </span>
-            </h2>
-            {/* <p
+              {user?.profile_picture ? (
+                <img
+                  src={getFullUrl(user.profile_picture) || ""}
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : (
+                <span className="material-symbols-outlined text-2xl text-primary/40">
+                  person
+                </span>
+              )}
+            </motion.div>
+
+            <div className="space-y-1">
+              <h2
+                className="text-3xl font-black tracking-tight text-white
+                           [-webkit-font-smoothing:antialiased]"
+              >
+                Welcome back,{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-400">
+                  {user?.name || "Member"}.
+                </span>
+              </h2>
+              {/* <p
               className="text-gray-400 text-sm flex items-center gap-2
                           [-webkit-font-smoothing:antialiased]"
             >
@@ -528,105 +629,109 @@ const Dashboard: React.FC = () => {
               />
               Member ID: {user?.id ? String(user.id).slice(0, 8) : "N/A"}
             </p> */}
+            </div>
           </div>
-        </div>
 
-        {/* Logout */}
-        <motion.button
-          onClick={handleLogout}
-          whileHover={{ scale: 1.04, y: -2 }}
-          whileTap={{ scale: 0.97 }}
-          transition={APPLE_SPRING}
-          className="px-6 py-2.5 bg-red-600/10 border border-red-600/20 text-red-500
+          {/* Logout */}
+          <motion.button
+            onClick={handleLogout}
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            transition={APPLE_SPRING}
+            className="px-6 py-2.5 bg-red-600/10 border border-red-600/20 text-red-500
                      text-xs font-bold uppercase tracking-widest rounded-xl
                      hover:bg-red-600 hover:text-white
                      transition-colors duration-200
                      flex items-center gap-2
                      will-change-transform
                      [-webkit-font-smoothing:antialiased]"
-          style={{ translateZ: 0 } as React.CSSProperties}
-        >
-          <span className="material-symbols-outlined text-[18px]">logout</span>
-          Logout
-        </motion.button>
-      </motion.header>
+            style={{ translateZ: 0 } as React.CSSProperties}
+          >
+            <span className="material-symbols-outlined text-[18px]">logout</span>
+            Logout
+          </motion.button>
+        </motion.header>
 
-      {/* ── Sub-nav ── */}
-      <nav className="flex gap-1 mb-10 overflow-x-auto pb-2 scrollbar-hide">
-        {navItems.map((item, i) => {
-          const active = location.pathname === item.path;
-          return (
-            <motion.div
-              key={item.path}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.38, ease: APPLE_EASE, delay: i * 0.05 }}
-            >
-              <Link
-                to={item.path}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold
+        {/* ── Sub-nav ── */}
+        <nav className="flex gap-1 mb-10 overflow-x-auto pb-2 scrollbar-hide">
+          {navItems.map((item, i) => {
+            const active = location.pathname === item.path;
+            return (
+              <motion.div
+                key={item.path}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.38, ease: APPLE_EASE, delay: i * 0.05 }}
+              >
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold
                             uppercase tracking-widest transition-colors duration-200
                             [-webkit-font-smoothing:antialiased]
                             ${active
-                    ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white border border-white/5"
-                  }`}
-              >
-                <span className="material-symbols-outlined text-[18px]">
-                  {item.icon}
-                </span>
-                {item.label}
-              </Link>
-            </motion.div>
-          );
-        })}
-      </nav>
+                      ? "bg-primary text-white shadow-lg shadow-primary/20"
+                      : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white border border-white/5"
+                    }`}
+                >
+                  <span className="material-symbols-outlined text-[18px]">
+                    {item.icon}
+                  </span>
+                  {item.label}
+                </Link>
+              </motion.div>
+            );
+          })}
+        </nav>
 
-      {/* ── Route views — y-only transitions, no scale ── */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.24, ease: APPLE_EASE }}
-          style={{ willChange: "opacity, transform" }}
-        >
-          <Routes location={location}>
-            <Route
-              index
-              element={
-                <Overview
-                  user={user}
-                  details={details}
-                  transactions={transactions}
-                  daysRemaining={daysRemaining}
-                  progressPercent={progressPercent}
-                />
-              }
-            />
-            <Route path="profile" element={<Profile />} />
-            {!isUserInactive && (
+        {/* ── Route views — y-only transitions, no scale ── */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.24, ease: APPLE_EASE }}
+            style={{ willChange: "opacity, transform" }}
+          >
+            <Routes location={location}>
               <Route
-                path="vouchers"
+                index
                 element={
-                  <Vouchers
+                  <Overview
                     user={user}
-                    membershipStatus={details?.status || "INACTIVE"}
-                    vouchers={vouchers}
-                    onClaim={claimVoucher}
+                    details={details}
+                    transactions={transactions}
+                    daysRemaining={daysRemaining}
+                    progressPercent={progressPercent}
+                    onEnableAutoPay={handleEnableAutoPay}
+                    onCancelAutoPay={handleCancelAutoPay}
+                    setIsPaymentLoading={setIsPaymentLoading}
                   />
                 }
               />
-            )}
-            <Route
-              path="payments"
-              element={<TransactionLedger transactions={transactions} />}
-            />
-          </Routes>
-        </motion.div>
-      </AnimatePresence>
-    </DashboardLayout>
+              <Route path="profile" element={<Profile />} />
+              {!isUserInactive && (
+                <Route
+                  path="vouchers"
+                  element={
+                    <Vouchers
+                      user={user}
+                      membershipStatus={details?.status || "INACTIVE"}
+                      vouchers={vouchers}
+                      onClaim={claimVoucher}
+                    />
+                  }
+                />
+              )}
+              <Route
+                path="payments"
+                element={<TransactionLedger transactions={transactions} />}
+              />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
+      </DashboardLayout>
+    </>
   );
 };
 

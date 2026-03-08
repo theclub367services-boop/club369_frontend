@@ -3,6 +3,7 @@ export type AutopayStatus = 'active' | 'failed' | 'inactive';
 
 export interface MembershipDetails {
     status: MembershipStatus;
+    startDate?: string;
     expiryDate: string;
     nextBillingDate: string;
     autopayStatus: AutopayStatus;

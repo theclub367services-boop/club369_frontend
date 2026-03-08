@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthState } from '../types/auth';
 import { AuthService } from '../services/AuthService';
+import { useIdleTimeout } from '../hooks/useIdleTimeout';
 
 interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
@@ -96,7 +97,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         // Perform silent authentication check on every app load
         refreshUser();
+
+        // Cross-tab Synchronization: Detect if user logged out in another tab
+        const syncLogout = (event: StorageEvent) => {
+            if (event.key === 'user' && !event.newValue) {
+                console.log("Logout detected in another tab. Syncing auth state locally.");
+                setState({
+                    user: null,
+                    isAuthenticated: false,
+                    isLoading: false,
+                });
+            }
+        };
+
+        window.addEventListener('storage', syncLogout);
+        return () => window.removeEventListener('storage', syncLogout);
     }, []);
+
+    // Activate the idle timeout listener (silent unless authenticated)
+    // Passed 30 minutes in milliseconds directly to the hook below via a wrapper component
+    // Wait, the hook needs to be used where `useAuth` is already available, or we do it inside a wrapper later.
+    // Actually, `useIdleTimeout` calls `useAuth()`. We cannot call it inside AuthProvider itself as that would create an infinite loop / context not found error.
+    // We will call it in `AppRoutes` alongside `useHeartbeat()`.
 
     return (
         <AuthContext.Provider value={{ ...state, login, logout, register, updateProfile }}>

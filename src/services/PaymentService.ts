@@ -26,6 +26,14 @@ export const PaymentService = {
         return await api.post('/payments/verify/', verificationData);
     },
 
+    verifyAutoPayPayment: async (verificationData: {
+        payment_id: string;
+        subscription_id: string;
+        signature: string;
+    }) => {
+        return await api.post('/autopay/verify-payment/', verificationData);
+    },
+
     // Unified flow to handle everything from order creation to verification
     handlePayment: async (options: {
         onSuccess: (verifyRes: any) => void;
@@ -47,6 +55,8 @@ export const PaymentService = {
             // 2. Create Order
             const orderResponse = await PaymentService.createOrder();
             const { id: order_id, amount, currency, key_id } = orderResponse;
+
+            if (!key_id) throw new Error("Backend did not return a valid Razorpay key element.");
 
             // 3. Setup Razorpay Options
             const rzpOptions = {
@@ -79,6 +89,62 @@ export const PaymentService = {
             };
 
             // 4. Open Modal
+            const rzp = new (window as any).Razorpay(rzpOptions);
+            rzp.open();
+
+        } catch (error: any) {
+            options.onError(error);
+        }
+    },
+
+    // Handle AutoPay Subscription creation
+    handleAutoPay: async (subscription_id: string, key_id: string, options: {
+        onSuccess: (response: any) => void;
+        onDismiss: () => void;
+        onError: (error: any) => void;
+        prefill?: {
+            name?: string;
+            email?: string;
+            contact?: string;
+        }
+    }) => {
+        try {
+            // 1. Ensure SDK is loaded
+            const isLoaded = await PaymentService.loadRazorpay("https://checkout.razorpay.com/v1/checkout.js");
+            if (!isLoaded) {
+                throw new Error("Razorpay SDK failed to load.");
+            }
+
+            // 2. Setup Razorpay Options for Subscription
+            if (!key_id) throw new Error("Backend did not explicitly return a Razorpay environment key. Frontend fallback disabled for security.");
+
+            const rzpOptions = {
+                key: key_id,
+                subscription_id: subscription_id,
+                name: "CLUB369",
+                description: "AutoPay Membership Subscription",
+                prefill: options.prefill,
+                handler: async (response: any) => {
+                    try {
+                        const verifyRes = await PaymentService.verifyAutoPayPayment({
+                            payment_id: response.razorpay_payment_id,
+                            subscription_id: response.razorpay_subscription_id,
+                            signature: response.razorpay_signature
+                        });
+                        options.onSuccess(verifyRes);
+                    } catch (error: any) {
+                        options.onError(error);
+                    }
+                },
+                modal: {
+                    ondismiss: options.onDismiss
+                },
+                theme: {
+                    color: "#8b5cf6"
+                }
+            };
+
+            // 3. Open Modal
             const rzp = new (window as any).Razorpay(rzpOptions);
             rzp.open();
 

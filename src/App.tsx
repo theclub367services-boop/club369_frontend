@@ -83,12 +83,14 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 
 // ─── AppRoutes ────────────────────────────────────────────────────────────────
 import { useHeartbeat } from "./hooks/useHeartbeat";
+import { useIdleTimeout } from "./hooks/useIdleTimeout";
 
 const AppRoutes = () => {
   const location = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useHeartbeat(300000);
+  useIdleTimeout(30 * 60 * 1000); // 30 minutes
 
   // Global loading state:
   // true  = auth hasn't resolved yet (first paint)

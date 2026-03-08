@@ -10,9 +10,10 @@ interface RenewButtonProps {
     email: string;
     name: string;
     mobile: string;
+    setIsPaymentLoading: (loading: boolean) => void;
 }
 
-const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, email, name, mobile }) => {
+const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, email, name, mobile, setIsPaymentLoading }) => {
     const [isProcessing, setIsProcessing] = useState(false);
     const navigate = useNavigate();
 
@@ -32,6 +33,7 @@ const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, e
         if (isProcessing) return;
 
         setIsProcessing(true);
+        setIsPaymentLoading(true);
         try {
             await PaymentService.handlePayment({
                 prefill: {
@@ -45,33 +47,37 @@ const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, e
                         navigate('/dashboard');
                     }
                     setIsProcessing(false);
+                    setIsPaymentLoading(false);
                 },
                 onDismiss: () => {
                     setIsProcessing(false);
+                    setIsPaymentLoading(false);
                 },
                 onError: (error: any) => {
                     console.error('Payment Error:', error);
                     const errorMsg = error.message || 'Failed to initiate payment. Please try again.';
                     alert(errorMsg);
                     setIsProcessing(false);
+                    setIsPaymentLoading(false);
                 }
             });
         } catch (error) {
             console.error('Payment Initiation Error:', error);
             setIsProcessing(false);
+            setIsPaymentLoading(false);
         }
     };
 
     if (!canRenew()) {
         return (
-            <div className="group relative">
+            <div className="relative">
                 <button
                     disabled
-                    className="w-full py-4 bg-gray-500/10 border border-white/5 text-gray-500 text-xs font-bold uppercase tracking-[0.2em] rounded-2xl cursor-not-allowed"
+                    className="peer w-full py-4 bg-gray-500/10 border border-white/5 text-gray-500 text-xs font-bold uppercase tracking-[0.2em] rounded-2xl cursor-not-allowed"
                 >
                     Renew Locked
                 </button>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-black border border-white/10 rounded-lg text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-black border border-white/10 rounded-lg text-[10px] text-gray-400 opacity-0 peer-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                     Renewal opens 5 days before expiry
                 </div>
             </div>

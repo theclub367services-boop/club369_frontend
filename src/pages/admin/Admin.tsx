@@ -579,10 +579,10 @@ const Admin: React.FC = () => {
     }
   }, []);
 
-const handleMarkAsPaid = async (memberId: string) => {
+  const handleMarkAsPaid = async (memberId: string) => {
     if (window.confirm('Are you sure you want to mark this user as PAID manually? This will create a successful payment record and extend membership.')) {
-            try {
-                await AdminService.markAsPaid(Number(memberId));
+      try {
+        await AdminService.markAsPaid(Number(memberId));
         alert('User successfully marked as PAID.');
 
         // Refresh the whole page to force UI defaults update across the board as requested.
@@ -601,12 +601,12 @@ const handleMarkAsPaid = async (memberId: string) => {
           const updated = (membersRes as Member[]).find(m => m.id === memberId);
           if (updated) setSelectedMember(updated);
         }
-            } catch (error: any) {
-                console.error("Failed to mark as paid", error);
+      } catch (error: any) {
+        console.error("Failed to mark as paid", error);
         alert(error?.response?.data?.error || error.message || "Failed to mark as paid");
-            }
-        }
-    };
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -1113,7 +1113,7 @@ const handleMarkAsPaid = async (memberId: string) => {
                         <table className="w-full text-left text-sm text-gray-400">
                           <thead className="text-[10px] uppercase font-bold text-gray-500 bg-white/5">
                             <tr>
-                              {["Date", "User", "Amount", "Status"].map(
+                              {["Date", "User", "Reference", "Amount", "Status"].map(
                                 (h, i) => (
                                   <th
                                     key={i}
@@ -1167,6 +1167,9 @@ const handleMarkAsPaid = async (memberId: string) => {
                                   </td>
                                   <td className="px-6 py-4 font-bold text-white [-webkit-font-smoothing:antialiased]">
                                     {txn.user_name || "Unknown"}
+                                  </td>
+                                  <td className="px-6 py-4 text-[10px] font-mono text-gray-400 [-webkit-font-smoothing:antialiased]">
+                                    {txn.transaction_id || "-"}
                                   </td>
                                   <td className="px-6 py-4 font-mono [-webkit-font-smoothing:antialiased]">
                                     ₹

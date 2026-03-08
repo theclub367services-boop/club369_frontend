@@ -16,6 +16,14 @@ export const MembershipService = {
 
     claimVoucher: async (voucherId: string): Promise<Voucher> => {
         return await api.post<Voucher>(`/vouchers/claim/${voucherId}/`);
+    },
+
+    enableAutoPay: async (): Promise<{ success: boolean; subscription_id: string; key_id: string }> => {
+        return await api.post<{ success: boolean; subscription_id: string; key_id: string }>('/autopay/enable/');
+    },
+
+    cancelAutoPay: async (): Promise<{ message: string }> => {
+        return await api.post<{ message: string }>('/autopay/cancel/');
     }
 };
 

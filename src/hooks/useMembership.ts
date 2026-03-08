@@ -51,5 +51,28 @@ export const useMembership = () => {
         }
     };
 
-    return { details, vouchers, transactions, isLoading, error, isRenewalAllowed, claimVoucher };
+    const enableAutoPay = async () => {
+        try {
+            const res = await MembershipService.enableAutoPay();
+            // Optimistically update or refresh
+            if (details) setDetails({ ...details, autopayStatus: 'active' });
+            return res;
+        } catch (err) {
+            setError('Failed to enable AutoPay');
+            throw err;
+        }
+    };
+
+    const cancelAutoPay = async () => {
+        try {
+            const res = await MembershipService.cancelAutoPay();
+            if (details) setDetails({ ...details, autopayStatus: 'inactive' });
+            return res;
+        } catch (err) {
+            setError('Failed to cancel AutoPay');
+            throw err;
+        }
+    };
+
+    return { details, vouchers, transactions, isLoading, error, isRenewalAllowed, claimVoucher, enableAutoPay, cancelAutoPay, setDetails };
 };
