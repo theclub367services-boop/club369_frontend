@@ -240,7 +240,7 @@ const Overview: React.FC<{
               <RenewButton
                 status={details?.status || 'INACTIVE'}
                 expiryDate={details?.expiryDate || ''}
-                amount={4999}
+                amount={1} // {4999}
                 email={user?.email || ''}
                 name={user?.name || ''}
                 mobile={user?.mobile || ''}

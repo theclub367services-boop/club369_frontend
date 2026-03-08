@@ -508,6 +508,7 @@ const Admin: React.FC = () => {
       setMembers((prev) => prev.filter((m) => m.id !== id));
       setShowMemberModal(false);
       setSelectedMember(null);
+      window.location.reload();
     } catch (e: any) {
       alert(e.message || "Failed to delete user");
     }
