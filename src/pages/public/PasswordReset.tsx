@@ -6,7 +6,7 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import axios from "axios";
+import api from "../../utils/api";
 
 // ─── Apple-tuned constants ────────────────────────────────────────────────────
 const APPLE_EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -138,10 +138,7 @@ const PasswordReset: React.FC = () => {
     setLoading(true);
     setStatusMsg(null);
     try {
-      await axios.post(
-        `${process.env.REACT_APP_API_URL}/auth/password-reset-confirm/${uid}/${token}/`,
-        { password },
-      );
+      await api.post(`/auth/password/reset/confirm/${uid}/${token}/`, { password });
       setStatusMsg({
         type: "success",
         text: "Password updated! Redirecting to login…",
@@ -150,7 +147,7 @@ const PasswordReset: React.FC = () => {
     } catch (err: any) {
       setStatusMsg({
         type: "error",
-        text: err.response?.data?.error || "Link invalid or expired.",
+        text: err.response?.data?.error || err.message || "Link invalid, malformed, or has expired.",
       });
     } finally {
       setLoading(false);
@@ -274,11 +271,10 @@ const PasswordReset: React.FC = () => {
                   className={`mb-6 p-3 rounded-xl text-xs font-bold uppercase
                               tracking-widest text-center border
                               [-webkit-font-smoothing:antialiased]
-                              ${
-                                statusMsg.type === "error"
-                                  ? "bg-red-500/10 border-red-500/20 text-red-400"
-                                  : "bg-primary/10 border-primary/20 text-primary"
-                              }`}
+                              ${statusMsg.type === "error"
+                      ? "bg-red-500/10 border-red-500/20 text-red-400"
+                      : "bg-primary/10 border-primary/20 text-primary"
+                    }`}
                   style={{ willChange: "opacity, transform" }}
                 >
                   {statusMsg.type === "success" && (

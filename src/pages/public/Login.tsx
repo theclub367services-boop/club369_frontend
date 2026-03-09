@@ -25,6 +25,8 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
+  const [resetStatus, setResetStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [resetMessage, setResetMessage] = useState("");
 
   // Controls the LoadingScreen overlay during sign-in
   const [signingIn, setSigningIn] = useState(false);
@@ -91,12 +93,28 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Reset email sent to:", resetEmail);
-    setIsForgotModalOpen(false);
-  };
+    if (!resetEmail) return;
 
+    setResetStatus("loading");
+    setResetMessage("");
+
+    try {
+      await AuthService.forgotPassword(resetEmail);
+      setResetStatus("success");
+      setResetMessage("A reset link has been sent to your email address.");
+      setTimeout(() => {
+        setIsForgotModalOpen(false);
+        setResetEmail("");
+        setResetStatus("idle");
+        setResetMessage("");
+      }, 3000);
+    } catch (error: any) {
+      setResetStatus("error");
+      setResetMessage(error?.message || error?.errors || "Failed to send reset link. Please try again.");
+    }
+  };
   const logoUrl = "/images/cloud369.png";
 
   return (
@@ -272,11 +290,15 @@ const Login: React.FC = () => {
                   </button>
                 </div>
 
-                {/* 
                 <div className="flex justify-end pt-1">
                   <button
                     type="button"
-                    onClick={() => setIsForgotModalOpen(true)}
+                    onClick={() => {
+                      setIsForgotModalOpen(true);
+                      setResetStatus("idle");
+                      setResetMessage("");
+                      setResetEmail("");
+                    }}
                     className="text-[10px] font-bold text-primary/80 hover:text-primary uppercase
                                tracking-tighter transition-colors duration-200
                                [-webkit-font-smoothing:antialiased]"
@@ -284,7 +306,6 @@ const Login: React.FC = () => {
                     Forgot Password?
                   </button>
                 </div>
-                */}
               </motion.div>
 
               {/* Submit */}
@@ -352,7 +373,6 @@ const Login: React.FC = () => {
       </div>
 
       {/* Forgot Password Modal */}
-      {/* 
       <AnimatePresence>
         {isForgotModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
@@ -390,6 +410,17 @@ const Login: React.FC = () => {
                 Enter your email and we'll send you instructions to reset your
                 password.
               </p>
+
+              {resetMessage && (
+                <div className={`mb-4 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest relative z-10
+                                [-webkit-font-smoothing:antialiased] ${resetStatus === "success"
+                    ? "bg-green-500/10 border border-green-500/20 text-green-500"
+                    : "bg-red-500/10 border border-red-500/20 text-red-500"
+                  }`}>
+                  {resetMessage}
+                </div>
+              )}
+
               <form
                 onSubmit={handleResetPassword}
                 className="space-y-4 relative z-10"
@@ -399,8 +430,10 @@ const Login: React.FC = () => {
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   placeholder="name@example.com"
+                  disabled={resetStatus === "loading" || resetStatus === "success"}
                   className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white
                              focus:border-primary focus:outline-none transition-colors duration-200
+                             disabled:opacity-50 disabled:cursor-not-allowed
                              [-webkit-font-smoothing:antialiased]"
                   required
                 />
@@ -408,21 +441,38 @@ const Login: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsForgotModalOpen(false)}
+                    disabled={resetStatus === "loading"}
                     className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white text-xs
                                font-bold uppercase tracking-widest transition-colors duration-200
-                               hover:bg-white/5 [-webkit-font-smoothing:antialiased]"
+                               hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed
+                               [-webkit-font-smoothing:antialiased]"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
+                    disabled={resetStatus === "loading" || resetStatus === "success"}
                     className="flex-1 px-4 py-3 rounded-xl bg-primary text-white text-xs font-bold
                                uppercase tracking-widest transition-all duration-200 ease-out
                                hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0
-                               shadow-[0_0_15px_rgba(175,37,244,0.3)] [-webkit-font-smoothing:antialiased]"
+                               shadow-[0_0_15px_rgba(175,37,244,0.3)] disabled:opacity-50 disabled:cursor-not-allowed
+                               [-webkit-font-smoothing:antialiased] flex items-center justify-center gap-2"
                     style={{ willChange: "transform" }}
                   >
-                    Send Link
+                    {resetStatus === "loading" ? (
+                      <>
+                        <motion.span
+                          className="material-symbols-outlined text-[16px] will-change-transform"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          progress_activity
+                        </motion.span>
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Link"
+                    )}
                   </button>
                 </div>
               </form>
@@ -430,7 +480,6 @@ const Login: React.FC = () => {
           </div>
         )}
       </AnimatePresence>
-      */}
       <LoadingScreen isLoading={signingIn} label="Signing In" fadeIn showDots />
     </div>
   );

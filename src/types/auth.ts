@@ -10,6 +10,7 @@ export interface User {
     status: string;
     membership_status?: 'ACTIVE' | 'EXPIRED' | 'INACTIVE';
     membership_end_date?: string;
+    autopay_status?: string;
     created_at?: string;
 }
 

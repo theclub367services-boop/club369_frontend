@@ -9,6 +9,10 @@ export const AuthService = {
         return user;
     },
 
+    forgotPassword: async (email: string): Promise<any> => {
+        return await api.post('auth/password/reset/', { email });
+    },
+
     logout: async (): Promise<void> => {
         try {
             await api.post('/auth/logout/');
