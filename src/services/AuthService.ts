@@ -37,6 +37,10 @@ export const AuthService = {
         return user;
     },
 
+    verifySession: async (): Promise<any> => {
+        return await api.get('/auth/verify-session/');
+    },
+
     updateProfile: async (data: Partial<User>): Promise<User> => {
         const user = await api.patch<any, User>('/auth/me/', data);
         localStorage.setItem('user', JSON.stringify(user));

@@ -18,7 +18,7 @@ export const useHeartbeat = (intervalMs = 300000) => {
 
         const checkSession = async () => {
             try {
-                await AuthService.getMe();
+                await AuthService.verifySession();
             } catch (error: any) {
                 // If we get a 401 and the interceptor didn't already handle it,
                 // ensure we clear the state here.

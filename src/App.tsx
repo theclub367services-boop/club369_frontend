@@ -89,7 +89,8 @@ const AppRoutes = () => {
   const location = useLocation();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  useHeartbeat(300000);
+  useHeartbeat(600000); // 10 minutes
+
   useIdleTimeout(30 * 60 * 1000); // 30 minutes
 
   // Global loading state:
