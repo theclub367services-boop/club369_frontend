@@ -121,8 +121,9 @@ const Checkout: React.FC = () => {
         },
         onSuccess: (verifyRes) => {
           if (verifyRes) {
-            alert("Payment Verified & Enrolment Activated!");
-            navigate("/dashboard");
+            alert("Payment Successful & Membership Activated!");
+            window.location.reload();
+            // navigate("/dashboard");
           }
           setIsLoading(false);
         },

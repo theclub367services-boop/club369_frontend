@@ -57,9 +57,9 @@ const ProtectedRoute = ({
   }
 
   // Redirect to payment if status is 'PENDING' and not already on payment page
-  // if (user?.role?.toUpperCase() === 'USER' && user?.status === 'PENDING' && window.location.hash !== '#/payment') {
-  //   return <Navigate to="/payment" replace />;
-  // }
+  if (user?.role?.toUpperCase() === 'USER' && user?.status === 'PENDING' && window.location.hash !== '#/payment') {
+    return <Navigate to="/payment" replace />;
+  }
 
   return <>{children}</>;
 };
