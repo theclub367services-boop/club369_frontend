@@ -8,9 +8,9 @@ import { AuthService } from '../services/AuthService';
  * 1. The session is still valid.
  * 2. Automatic token rotation/refresh happens even during idle in-page navigation.
  * 
- * @param intervalMs Frequency of the check (default 5 minutes)
+ * @param intervalMs Frequency of the check (default 10 minutes)
  */
-export const useHeartbeat = (intervalMs = 300000) => {
+export const useHeartbeat = (intervalMs = 600000) => {
     const { isAuthenticated, logout } = useAuth();
 
     useEffect(() => {

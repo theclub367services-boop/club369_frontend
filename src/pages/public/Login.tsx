@@ -90,11 +90,17 @@ const Login: React.FC = () => {
     } catch (err: any) {
       setSigningIn(false); // ← hide LoadingScreen, show error
       const raw = err?.response?.data ?? err?.data ?? err;
-      const backendMsg =
+      let backendMsg =
         raw?.detail ||
         raw?.message ||
         raw?.errors?.detail ||
         (typeof raw === "string" ? raw : null);
+
+      if (backendMsg === 'Refresh token missing' || backendMsg === 'No active account found with the given credentials' || backendMsg === 'Invalid credentials. Please try again.') {
+        backendMsg = 'Invalid credentials. Please try again.';
+      }
+
+      console.error("Login error:", err);
 
       setErrorModal({
         title: "Login Failed",
