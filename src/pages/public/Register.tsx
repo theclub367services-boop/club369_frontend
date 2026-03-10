@@ -560,6 +560,15 @@ const Register: React.FC = () => {
         message: `The following field${missing.length > 1 ? "s are" : " is"} required to create your account: ${missing.join(", ")}.`,
       };
     }
+
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+    if (!passwordPattern.test(formData.password)) {
+      return {
+        title: "Invalid Password",
+        message: "Password should be long, unique, and include a mix of uppercase and lowercase letters, numbers, and special characters",
+      };
+    }
+
     return null;
   };
 
@@ -867,6 +876,9 @@ const Register: React.FC = () => {
                       </span>
                     </motion.button>
                   </div>
+                  <p className="text-[10px] text-gray-400 tracking-wider leading-relaxed pt-1 [-webkit-font-smoothing:antialiased]">
+                    <span className="font-bold text-gray-300">Note:</span> Password should be long, unique, and include a mix of uppercase and lowercase letters, numbers, and special characters
+                  </p>
                 </motion.div>
 
                 {/* Required fields note */}

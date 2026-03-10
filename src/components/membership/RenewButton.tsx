@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PaymentService } from '../../services/PaymentService';
 import { useNavigate } from 'react-router-dom';
+import ErrorModal from '../layout/ErrorModal';
 
 interface RenewButtonProps {
     status: string;
@@ -15,6 +16,7 @@ interface RenewButtonProps {
 
 const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, email, name, mobile, setIsPaymentLoading }) => {
     const [isProcessing, setIsProcessing] = useState(false);
+    const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
     const navigate = useNavigate();
 
     const canRenew = () => {
@@ -56,13 +58,14 @@ const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, e
                 onError: (error: any) => {
                     console.error('Payment Error:', error);
                     const errorMsg = error.message || 'Failed to initiate payment. Please try again.';
-                    alert(errorMsg);
+                    setErrorModal({ title: "Renewal Failed", message: errorMsg });
                     setIsProcessing(false);
                     setIsPaymentLoading(false);
                 }
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Payment Initiation Error:', error);
+            setErrorModal({ title: "Renewal Error", message: error.message || "Could not initiate payment" });
             setIsProcessing(false);
             setIsPaymentLoading(false);
         }
@@ -85,25 +88,34 @@ const RenewButton: React.FC<RenewButtonProps> = ({ status, expiryDate, amount, e
     }
 
     return (
-        <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handlePayment}
-            disabled={isProcessing}
-            className={`w-full py-4 ${isProcessing ? 'bg-primary/50' : 'bg-primary'} text-white text-xs font-bold uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2`}
-        >
-            {isProcessing ? (
-                <>
-                    <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    Processing...
-                </>
-            ) : (
-                <>
-                    <span className="material-symbols-outlined text-sm">bolt</span>
-                    Renew Membership
-                </>
-            )}
-        </motion.button>
+        <>
+            <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handlePayment}
+                disabled={isProcessing}
+                className={`w-full py-4 ${isProcessing ? 'bg-primary/50' : 'bg-primary'} text-white text-xs font-bold uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2`}
+            >
+                {isProcessing ? (
+                    <>
+                        <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        Processing...
+                    </>
+                ) : (
+                    <>
+                        <span className="material-symbols-outlined text-sm">bolt</span>
+                        Renew Membership
+                    </>
+                )}
+            </motion.button>
+
+            <ErrorModal
+                visible={!!errorModal}
+                title={errorModal?.title}
+                message={errorModal?.message ?? ""}
+                onClose={() => setErrorModal(null)}
+            />
+        </>
     );
 };
 

@@ -21,7 +21,7 @@ const Login: React.FC = () => {
   const { login, isAuthenticated, user, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -71,7 +71,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setErrorModal(null);
     setSigningIn(true); // ← show LoadingScreen
 
     try {
@@ -87,9 +87,19 @@ const Login: React.FC = () => {
       } else {
         navigate("/dashboard");
       }
-    } catch {
+    } catch (err: any) {
       setSigningIn(false); // ← hide LoadingScreen, show error
-      setError("Invalid credentials. Please try again.");
+      const raw = err?.response?.data ?? err?.data ?? err;
+      const backendMsg =
+        raw?.detail ||
+        raw?.message ||
+        raw?.errors?.detail ||
+        (typeof raw === "string" ? raw : null);
+
+      setErrorModal({
+        title: "Login Failed",
+        message: backendMsg || "Invalid credentials. Please try again.",
+      });
     }
   };
 
@@ -195,21 +205,6 @@ const Login: React.FC = () => {
               </h1>
               <div className="w-24 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent mt-3" />
 
-              <AnimatePresence>
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.25, ease: APPLE_EASE }}
-                    className="mt-4 px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-lg
-                               text-red-500 text-[10px] font-bold uppercase tracking-widest
-                               [-webkit-font-smoothing:antialiased]"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </motion.div>
 
             {/* Form */}
@@ -370,119 +365,241 @@ const Login: React.FC = () => {
             </motion.div>
           </div>
         </motion.div>
-      </div>
+      </div >
 
       {/* Forgot Password Modal */}
       <AnimatePresence>
-        {isForgotModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: APPLE_EASE }}
-              onClick={() => setIsForgotModalOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 16 }}
-              transition={{ duration: 0.3, ease: APPLE_EASE }}
-              style={{ willChange: "opacity, transform" }}
-              className="relative w-full max-w-sm bg-[#1a151c] border border-white/10
-                         rounded-3xl p-8 shadow-2xl overflow-hidden"
-            >
-              <div
-                className="absolute top-0 right-0 w-32 h-32 bg-primary/8 rounded-full blur-3xl pointer-events-none"
-                style={{
-                  transform: "translateZ(0)",
-                  backfaceVisibility: "hidden",
-                }}
+        {
+          isForgotModalOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2, ease: APPLE_EASE }}
+                onClick={() => setIsForgotModalOpen(false)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
               />
-              <h2
-                className="text-xl font-bold text-white mb-2 tracking-tight relative z-10
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 16 }}
+                transition={{ duration: 0.3, ease: APPLE_EASE }}
+                style={{ willChange: "opacity, transform" }}
+                className="relative w-full max-w-sm bg-[#1a151c] border border-white/10
+                         rounded-3xl p-8 shadow-2xl overflow-hidden"
+              >
+                <div
+                  className="absolute top-0 right-0 w-32 h-32 bg-primary/8 rounded-full blur-3xl pointer-events-none"
+                  style={{
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden",
+                  }}
+                />
+                <h2
+                  className="text-xl font-bold text-white mb-2 tracking-tight relative z-10
                              [-webkit-font-smoothing:antialiased]"
-              >
-                Reset Password
-              </h2>
-              <p className="text-xs text-gray-400 mb-6 relative z-10 [-webkit-font-smoothing:antialiased]">
-                Enter your email and we'll send you instructions to reset your
-                password.
-              </p>
+                >
+                  Reset Password
+                </h2>
+                <p className="text-xs text-gray-400 mb-6 relative z-10 [-webkit-font-smoothing:antialiased]">
+                  Enter your email and we'll send you instructions to reset your
+                  password.
+                </p>
 
-              {resetMessage && (
-                <div className={`mb-4 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest relative z-10
+                {resetMessage && (
+                  <div className={`mb-4 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest relative z-10
                                 [-webkit-font-smoothing:antialiased] ${resetStatus === "success"
-                    ? "bg-green-500/10 border border-green-500/20 text-green-500"
-                    : "bg-red-500/10 border border-red-500/20 text-red-500"
-                  }`}>
-                  {resetMessage}
-                </div>
-              )}
+                      ? "bg-green-500/10 border border-green-500/20 text-green-500"
+                      : "bg-red-500/10 border border-red-500/20 text-red-500"
+                    }`}>
+                    {resetMessage}
+                  </div>
+                )}
 
-              <form
-                onSubmit={handleResetPassword}
-                className="space-y-4 relative z-10"
-              >
-                <input
-                  type="email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  disabled={resetStatus === "loading" || resetStatus === "success"}
-                  className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white
+                <form
+                  onSubmit={handleResetPassword}
+                  className="space-y-4 relative z-10"
+                >
+                  <input
+                    type="email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    disabled={resetStatus === "loading" || resetStatus === "success"}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white
                              focus:border-primary focus:outline-none transition-colors duration-200
                              disabled:opacity-50 disabled:cursor-not-allowed
                              [-webkit-font-smoothing:antialiased]"
-                  required
-                />
-                <div className="flex gap-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setIsForgotModalOpen(false)}
-                    disabled={resetStatus === "loading"}
-                    className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white text-xs
+                    required
+                  />
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setIsForgotModalOpen(false)}
+                      disabled={resetStatus === "loading"}
+                      className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white text-xs
                                font-bold uppercase tracking-widest transition-colors duration-200
                                hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed
                                [-webkit-font-smoothing:antialiased]"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={resetStatus === "loading" || resetStatus === "success"}
-                    className="flex-1 px-4 py-3 rounded-xl bg-primary text-white text-xs font-bold
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={resetStatus === "loading" || resetStatus === "success"}
+                      className="flex-1 px-4 py-3 rounded-xl bg-primary text-white text-xs font-bold
                                uppercase tracking-widest transition-all duration-200 ease-out
                                hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0
                                shadow-[0_0_15px_rgba(175,37,244,0.3)] disabled:opacity-50 disabled:cursor-not-allowed
                                [-webkit-font-smoothing:antialiased] flex items-center justify-center gap-2"
-                    style={{ willChange: "transform" }}
-                  >
-                    {resetStatus === "loading" ? (
-                      <>
-                        <motion.span
-                          className="material-symbols-outlined text-[16px] will-change-transform"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        >
-                          progress_activity
-                        </motion.span>
-                        Sending...
-                      </>
-                    ) : (
-                      "Send Link"
-                    )}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+                      style={{ willChange: "transform" }}
+                    >
+                      {resetStatus === "loading" ? (
+                        <>
+                          <motion.span
+                            className="material-symbols-outlined text-[16px] will-change-transform"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          >
+                            progress_activity
+                          </motion.span>
+                          Sending...
+                        </>
+                      ) : (
+                        "Send Link"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )
+        }
+      </AnimatePresence >
       <LoadingScreen isLoading={signingIn} label="Signing In" fadeIn showDots />
-    </div>
+      {/* Error modal — validation + API errors */}
+      <ErrorModal
+        visible={!!errorModal}
+        title={errorModal?.title}
+        message={errorModal?.message ?? ""}
+        onClose={() => setErrorModal(null)}
+      />
+    </div >
   );
 };
+
+// ─── ErrorModal ───────────────────────────────────────────────────────────────
+const ErrorModal: React.FC<{
+  visible: boolean;
+  title?: string;
+  message: string;
+  onClose: () => void;
+}> = ({ visible, title = "Error", message, onClose }) => (
+  <AnimatePresence>
+    {visible && (
+      <motion.div
+        key="error-modal"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25, ease: APPLE_EASE }}
+        className="fixed inset-0 z-[9998] flex items-center justify-center px-6 bg-black/70 backdrop-blur-md"
+        style={{ willChange: "opacity" }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
+          transition={{ duration: 0.38, ease: APPLE_EASE, delay: 0.06 }}
+          className="relative w-full max-w-sm bg-[#161118] border border-white/10
+                     rounded-3xl p-8 shadow-2xl overflow-hidden text-center will-change-transform"
+          style={{ translateZ: 0 } as React.CSSProperties}
+        >
+          {/* Red ambient glow */}
+          <div
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[260px] h-[160px]
+                          bg-red-500/12 rounded-full blur-[60px] pointer-events-none"
+            style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+          />
+          <div
+            className="absolute bottom-0 right-0 w-40 h-40 bg-red-900/8 rounded-full blur-3xl pointer-events-none"
+            style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
+          />
+
+          {/* Badge */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 340, damping: 28, delay: 0.18 }}
+            className="relative z-10 mx-auto mb-6 w-20 h-20 rounded-full
+                       bg-red-500/15 border border-red-500/30
+                       flex items-center justify-center will-change-transform"
+            style={{ translateZ: 0 } as React.CSSProperties}
+          >
+            <motion.div
+              className="absolute inset-0 rounded-full border border-red-500/25 will-change-transform"
+              animate={{ opacity: [0.8, 0], scale: [1, 1.55] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
+              style={{ translateZ: 0 } as React.CSSProperties}
+            />
+            <motion.span
+              className="material-symbols-outlined text-4xl text-red-400"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: APPLE_EASE, delay: 0.32 }}
+            >
+              error
+            </motion.span>
+          </motion.div>
+
+          {/* Text */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.38, ease: APPLE_EASE, delay: 0.28 }}
+            className="relative z-10 space-y-2 mb-8"
+          >
+            <h2 className="text-2xl font-bold text-white tracking-tight [-webkit-font-smoothing:antialiased]">
+              {title}
+            </h2>
+            <p className="text-sm text-gray-400 leading-relaxed [-webkit-font-smoothing:antialiased]">
+              {message}
+            </p>
+          </motion.div>
+
+          <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent mb-6" />
+
+          {/* Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.34, ease: APPLE_EASE, delay: 0.38 }}
+            className="relative z-10 flex gap-3"
+          >
+            <motion.button
+              onClick={onClose}
+              whileHover={{ scale: 1.025, y: -2 }}
+              whileTap={{ scale: 0.975 }}
+              className="flex-1 bg-white text-black hover:bg-primary hover:text-white
+                         font-bold tracking-widest uppercase rounded-xl py-3.5
+                         transition-colors duration-200 shadow-lg
+                         hover:shadow-[0_0_30px_rgba(175,37,244,0.35)]
+                         flex items-center justify-center gap-1.5
+                         will-change-transform [-webkit-font-smoothing:antialiased]"
+              style={{ translateZ: 0 } as React.CSSProperties}
+            >
+              <span className="material-symbols-outlined text-[16px]">refresh</span>
+              Try Again
+            </motion.button>
+          </motion.div>
+
+          <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-red-500/15 rounded-tl-3xl" />
+          <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-red-500/15 rounded-br-3xl" />
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
 export default Login;

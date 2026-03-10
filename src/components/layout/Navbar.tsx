@@ -4,10 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { AuthService } from '../../services/AuthService';
 import ProfileAvatar from './ProfileAvatar';
+import ErrorModal from './ErrorModal';
 
 const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -118,7 +120,7 @@ const Navbar: React.FC = () => {
                     onClick={() => {
                       const user = AuthService.getCurrentUser();
                       if (user?.role?.toLowerCase() === 'user' && user?.status === 'PENDING') {
-                        alert("Don't have access Until you complete payment");
+                        setErrorModal({ title: "Access Denied", message: "Don't have access Until you complete payment" });
                         navigate('/payment');
                       } else {
                         navigate(user?.role?.toLowerCase() === 'admin' ? '/admin/profile' : '/dashboard/profile');
@@ -148,6 +150,13 @@ const Navbar: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ErrorModal
+        visible={!!errorModal}
+        title={errorModal?.title}
+        message={errorModal?.message ?? ""}
+        onClose={() => setErrorModal(null)}
+      />
     </nav>
   );
 };
