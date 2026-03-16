@@ -561,14 +561,45 @@ const Register: React.FC = () => {
       };
     }
 
-    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordPattern.test(formData.password)) {
+    // const passwordPattern =
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const password = formData.password;
+
+    if (password.length < 8) {
       return {
         title: "Invalid Password",
-        message: "Password should be long, unique, and include a mix of uppercase and lowercase letters, numbers, and special characters",
+        message: "Password must be at least 8 characters long.",
       };
     }
 
+    if (!/[a-z]/.test(password)) {
+      return {
+        title: "Invalid Password",
+        message: "Password must include at least one lowercase letter.",
+      };
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return {
+        title: "Invalid Password",
+        message: "Password must include at least one uppercase letter.",
+      };
+    }
+
+    if (!/\d/.test(password)) {
+      return {
+        title: "Invalid Password",
+        message: "Password must include at least one number.",
+      };
+    }
+
+    if (!/[@$!%*?&]/.test(password)) {
+      return {
+        title: "Invalid Password",
+        message:
+          "Password must include at least one special character (@$!%*?&).",
+      };
+    }
     return null;
   };
 
@@ -877,7 +908,10 @@ const Register: React.FC = () => {
                     </motion.button>
                   </div>
                   <p className="text-[10px] text-gray-400 tracking-wider leading-relaxed pt-1 [-webkit-font-smoothing:antialiased]">
-                    <span className="font-bold text-gray-300">Note:</span> Password should be long, unique, and include a mix of uppercase and lowercase letters, numbers, and special characters
+                    <span className="font-bold text-gray-300">Note:</span>{" "}
+                    Passwords must be at least 8 characters long, unique and
+                    include a mix of uppercase and lowercase letters, numbers,
+                    and special characters
                   </p>
                 </motion.div>
 
