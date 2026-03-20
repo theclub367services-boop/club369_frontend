@@ -20,7 +20,8 @@ import { User as Member } from "../../types/auth";
 import { Transaction } from "../../types/membership";
 import { getFullUrl } from "../../utils/url";
 import { formatDate } from "../../utils/date";
-
+import { VentureAdmin } from "./VentureAdmin";
+import { RedemptionReportAdmin } from "./RedemptionReportAdmin";
 // ─── Apple-tuned constants ────────────────────────────────────────────────────
 const APPLE_EASE = [0.25, 0.1, 0.25, 1] as const;
 const APPLE_SPRING = { stiffness: 380, damping: 38, mass: 1 } as const;
@@ -57,7 +58,8 @@ const NAV_ITEMS = [
     path: "/admin/transactions",
     icon: "account_balance",
   },
-  { label: "Vouchers", path: "/admin/vouchers", icon: "confirmation_number" },
+  { label: "Ventures", path: "/admin/ventures", icon: "storefront" },
+  { label: "Redemptions", path: "/admin/redemptions", icon: "receipt_long" },
 ];
 
 // ─── StatCard ─────────────────────────────────────────────────────────────────
@@ -452,14 +454,12 @@ const Admin: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [m, t, v] = await Promise.all([
+        const [m, t] = await Promise.all([
           AdminService.getUsers(),
           AdminService.getTransactions(),
-          AdminService.getVouchers(),
         ]);
         setMembers(Array.isArray(m) ? m : []);
         setTransactions(Array.isArray(t) ? t : []);
-        setVouchers(Array.isArray(v) ? v : []);
       } catch (e) {
         console.error("Failed to fetch admin data", e);
       } finally {
@@ -536,50 +536,6 @@ const Admin: React.FC = () => {
     }).click();
   }, [members]);
 
-  const handleCreateVoucher = useCallback(async () => {
-    if (!newVoucher.title || !newVoucher.code || !newVoucher.expiry) {
-      setErrorModal({ title: "Validation Error", message: "Please fill all fields" });
-      return;
-    }
-    try {
-      const created = await AdminService.createVoucher({
-        title: newVoucher.title,
-        code: newVoucher.code.toUpperCase(),
-        expiryDate: newVoucher.expiry,
-        description: newVoucher.description,
-        max_usage_per_user: 1,
-        valid_from: new Date().toISOString(),
-      });
-      setVouchers((prev) => [created, ...prev]);
-      setShowVoucherForm(false);
-      setNewVoucher({ title: "", code: "", expiry: "", description: "" });
-    } catch {
-      setErrorModal({ title: "Creation Failed", message: "Failed to create voucher" });
-    }
-  }, [newVoucher]);
-
-  const toggleSuspendVoucher = useCallback(async (id: string) => {
-    try {
-      const res = await AdminService.toggleVoucherStatus(id);
-      setVouchers((prev) =>
-        prev.map((v) =>
-          v.id === id ? { ...v, isSuspended: !res.is_active } : v,
-        ),
-      );
-    } catch {
-      setErrorModal({ title: "Toggle Failed", message: "Failed to toggle voucher status" });
-    }
-  }, []);
-
-  const handleDeleteVoucher = useCallback(async (id: string) => {
-    if (!window.confirm("Delete this voucher?")) return;
-    try {
-      await AdminService.deleteVoucher(id);
-      setVouchers((prev) => prev.filter((v) => v.id !== id));
-    } catch {
-      setErrorModal({ title: "Deletion Failed", message: "Failed to delete voucher" });
-    }
-  }, []);
 
   const handleMarkAsPaid = async (memberId: string) => {
     if (window.confirm('Are you sure you want to mark this user as PAID manually? This will create a successful payment record and extend membership.')) {
@@ -1216,238 +1172,16 @@ const Admin: React.FC = () => {
                   }
                 />
 
-                {/* ── Vouchers ── */}
+                {/* ── Ventures ── */}
                 <Route
-                  path="vouchers"
-                  element={
-                    <motion.div
-                      variants={fadeUp}
-                      initial="hidden"
-                      animate="visible"
-                      className="space-y-6"
-                    >
-                      <div className="bg-[#161118] border border-white/10 rounded-2xl p-6">
-                        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                          <h3
-                            className="text-xl font-bold text-white flex items-center gap-2
-                                       [-webkit-font-smoothing:antialiased]"
-                          >
-                            <span className="material-symbols-outlined text-primary">
-                              confirmation_number
-                            </span>
-                            Voucher Management
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <div className="relative group min-w-[200px]">
-                              <span
-                                className="material-symbols-outlined absolute left-3 inset-y-0 my-auto h-fit
-                                             flex items-center text-gray-500 text-sm
-                                             group-focus-within:text-primary transition-colors pointer-events-none"
-                              >
-                                search
-                              </span>
-                              <input
-                                type="text"
-                                placeholder="Search title/code..."
-                                value={voucherSearch}
-                                onChange={(e) =>
-                                  setVoucherSearch(e.target.value)
-                                }
-                                className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2
-                                         text-xs text-white outline-none focus:border-primary/50
-                                         transition-colors duration-200 [-webkit-font-smoothing:antialiased]"
-                              />
-                            </div>
-                            <select
-                              value={voucherStatusFilter}
-                              onChange={(e) =>
-                                setVoucherStatusFilter(e.target.value as any)
-                              }
-                              className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs
-                                       text-gray-400 outline-none focus:border-primary/50 cursor-pointer
-                                       transition-colors duration-200 [-webkit-font-smoothing:antialiased]"
-                            >
-                              <option value="all">All Status</option>
-                              <option value="active">Active</option>
-                              <option value="suspended">Suspended</option>
-                              <option value="expired">Expired</option>
-                            </select>
-                            <motion.button
-                              onClick={() => setShowVoucherForm((p) => !p)}
-                              whileHover={{ scale: 1.04, y: -2 }}
-                              whileTap={{ scale: 0.97 }}
-                              transition={APPLE_SPRING}
-                              className="px-4 py-2 bg-primary text-white text-xs font-bold uppercase tracking-widest
-                                       rounded-xl hover:bg-primary/80 transition-colors duration-200
-                                       flex items-center gap-2 will-change-transform
-                                       [-webkit-font-smoothing:antialiased]"
-                              style={{ translateZ: 0 } as React.CSSProperties}
-                            >
-                              <span className="material-symbols-outlined text-sm">
-                                {showVoucherForm ? "close" : "add"}
-                              </span>
-                              {showVoucherForm ? "Cancel" : "New Voucher"}
-                            </motion.button>
-                          </div>
-                        </div>
-
-                        {/* Voucher form */}
-                        <AnimatePresence>
-                          {showVoucherForm && (
-                            <motion.div
-                              initial={{ opacity: 0, y: -8, height: 0 }}
-                              animate={{ opacity: 1, y: 0, height: "auto" }}
-                              exit={{ opacity: 0, y: -8, height: 0 }}
-                              transition={{ duration: 0.28, ease: APPLE_EASE }}
-                              className="mb-8 overflow-hidden"
-                            >
-                              <div
-                                className="p-6 bg-white/5 border border-white/10 rounded-xl
-                                            grid grid-cols-1 md:grid-cols-3 gap-4"
-                              >
-                                {[
-                                  {
-                                    label: "Voucher Title",
-                                    key: "title",
-                                    ph: "e.g. Summer Discount",
-                                    cls: "",
-                                  },
-                                  {
-                                    label: "Description",
-                                    key: "description",
-                                    ph: "Voucher Description",
-                                    cls: "md:col-span-2",
-                                  },
-                                  {
-                                    label: "Voucher Code",
-                                    key: "code",
-                                    ph: "e.g. SUMMER369",
-                                    cls: "",
-                                  },
-                                ].map((f) => (
-                                  <div key={f.key} className={f.cls}>
-                                    <label
-                                      className="text-[10px] font-bold text-gray-500 uppercase mb-1 block
-                                                    [-webkit-font-smoothing:antialiased]"
-                                    >
-                                      {f.label}
-                                    </label>
-                                    <input
-                                      type="text"
-                                      placeholder={f.ph}
-                                      value={(newVoucher as any)[f.key]}
-                                      onChange={(e) =>
-                                        setNewVoucher((p) => ({
-                                          ...p,
-                                          [f.key]: e.target.value,
-                                        }))
-                                      }
-                                      className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2
-                                               text-xs text-white outline-none focus:border-primary
-                                               transition-colors duration-200 [-webkit-font-smoothing:antialiased]"
-                                    />
-                                  </div>
-                                ))}
-                                <div className="flex gap-2 items-end">
-                                  <div className="flex-1">
-                                    <label
-                                      className="text-[10px] font-bold text-gray-500 uppercase mb-1 block
-                                                    [-webkit-font-smoothing:antialiased]"
-                                    >
-                                      Expiry Date
-                                    </label>
-                                    <input
-                                      type="date"
-                                      value={newVoucher.expiry}
-                                      onChange={(e) =>
-                                        setNewVoucher((p) => ({
-                                          ...p,
-                                          expiry: e.target.value,
-                                        }))
-                                      }
-                                      className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2
-                                               text-xs text-white outline-none focus:border-primary
-                                               transition-colors duration-200 [color-scheme:dark]"
-                                    />
-                                  </div>
-                                  <motion.button
-                                    onClick={handleCreateVoucher}
-                                    whileHover={{ scale: 1.04, y: -2 }}
-                                    whileTap={{ scale: 0.97 }}
-                                    transition={APPLE_SPRING}
-                                    className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold uppercase
-                                             tracking-widest rounded-lg hover:bg-emerald-500
-                                             transition-colors duration-200 will-change-transform
-                                             [-webkit-font-smoothing:antialiased]"
-                                    style={
-                                      { translateZ: 0 } as React.CSSProperties
-                                    }
-                                  >
-                                    Create
-                                  </motion.button>
-                                </div>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left text-sm text-gray-400">
-                            <thead className="text-[10px] uppercase font-bold text-gray-500 bg-white/5">
-                              <tr>
-                                {[
-                                  "Voucher (Title/Code)",
-                                  "Status",
-                                  "Expiry",
-                                  "Usage",
-                                  "Actions",
-                                ].map((h, i) => (
-                                  <th
-                                    key={i}
-                                    className={`px-6 py-4 [-webkit-font-smoothing:antialiased] ${i === 4 ? "text-right" : ""}`}
-                                  >
-                                    {h}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/5">
-                              {vouchers
-                                .filter((v) => {
-                                  const isExpired =
-                                    new Date(v.expiryDate) < new Date();
-                                  const s = v.isSuspended
-                                    ? "suspended"
-                                    : isExpired
-                                      ? "expired"
-                                      : "active";
-                                  return (
-                                    (v.title
-                                      .toLowerCase()
-                                      .includes(voucherSearch.toLowerCase()) ||
-                                      v.code
-                                        .toLowerCase()
-                                        .includes(
-                                          voucherSearch.toLowerCase(),
-                                        )) &&
-                                    (voucherStatusFilter === "all" ||
-                                      s === voucherStatusFilter)
-                                  );
-                                })
-                                .map((v) => (
-                                  <VoucherRow
-                                    key={v.id}
-                                    v={v}
-                                    onToggle={toggleSuspendVoucher}
-                                    onDelete={handleDeleteVoucher}
-                                  />
-                                ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </motion.div>
-                  }
+                  path="ventures"
+                  element={<VentureAdmin />}
+                />
+                
+                {/* ── Redemptions ── */}
+                <Route
+                  path="redemptions"
+                  element={<RedemptionReportAdmin />}
                 />
               </Routes>
             </motion.div>

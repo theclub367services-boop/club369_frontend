@@ -1,4 +1,4 @@
-import { MembershipDetails, Voucher, Transaction } from '../types/membership';
+import { MembershipDetails, Venture, Transaction, RedemptionResult } from '../types/membership';
 import api from '../utils/api';
 
 export const MembershipService = {
@@ -6,16 +6,20 @@ export const MembershipService = {
         return await api.get<MembershipDetails>('/membership/details/');
     },
 
-    getVouchers: async (): Promise<Voucher[]> => {
-        return await api.get<Voucher[]>('/vouchers/');
+    getVentures: async (): Promise<Venture[]> => {
+        return await api.get<Venture[]>('/vouchers/ventures/');
     },
 
     getTransactions: async (): Promise<Transaction[]> => {
         return await api.get<Transaction[]>('/membership/transactions/');
     },
 
-    claimVoucher: async (voucherId: string): Promise<Voucher> => {
-        return await api.post<Voucher>(`/vouchers/claim/${voucherId}/`);
+    redeemVoucher: async (ventureId: string, branchId: string, billAmount: number): Promise<RedemptionResult> => {
+        return await api.post<RedemptionResult>(`/vouchers/redeem/`, {
+            venture_id: ventureId,
+            branch_id: branchId,
+            bill_amount: billAmount
+        });
     },
 
     enableAutoPay: async (): Promise<{ success: boolean; subscription_id: string; key_id: string }> => {

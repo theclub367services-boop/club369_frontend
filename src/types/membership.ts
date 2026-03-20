@@ -18,9 +18,27 @@ export interface Transaction {
     method: string;
 }
 
-export interface Voucher {
+export interface Branch {
     id: string;
-    title: string;
-    description: string;
-    isClaimed: boolean;
+    venture: string;
+    branch_name: string;
+}
+
+export interface Venture {
+    id: string;
+    name: string;
+    type: 'OWN' | 'PARTNER';
+    discount_percentage: string;
+    poster: string | null;
+    icon: string | null;
+    status: 'ACTIVE' | 'SUSPENDED';
+    branches?: Branch[]; 
+}
+
+export interface RedemptionResult {
+    actual_bill_amount: string;
+    discount_amount: string;
+    final_paid_amount: string;
+    branch_name: string;
+    redeemed_at: string;
 }

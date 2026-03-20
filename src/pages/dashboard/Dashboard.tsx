@@ -17,7 +17,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useMembership } from "../../hooks/useMembership";
 import Profile from "../shared/Profile";
 import RenewButton from "../../components/membership/RenewButton";
-import VoucherCard from "../../components/vouchers/VoucherCard";
+import VentureSection from "../../components/vouchers/VentureSection";
 import { getFullUrl } from "../../utils/url";
 import { formatDate } from "../../utils/date";
 import { PaymentService } from "../../services/PaymentService";
@@ -326,59 +326,7 @@ const Overview: React.FC<{
   </div>
 );
 
-// ─── Vouchers ─────────────────────────────────────────────────────────────────
-interface VouchersProps {
-  user: any;
-  membershipStatus: string;
-  vouchers: any[];
-  onClaim: (id: string) => void;
-}
-
-const Vouchers: React.FC<VouchersProps> = ({
-  membershipStatus,
-  vouchers,
-  onClaim,
-}) => (
-  <div className="space-y-8">
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-      className="flex justify-between items-end"
-    >
-      <div>
-        <h2
-          className="text-2xl font-bold text-white mb-2 uppercase tracking-tighter
-                       [-webkit-font-smoothing:antialiased]"
-        >
-          My Rewards
-        </h2>
-        <p className="text-gray-500 text-sm [-webkit-font-smoothing:antialiased]">
-          Exclusive benefits curated for your membership tier.
-        </p>
-      </div>
-    </motion.div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {vouchers.map((v, i) => (
-        <motion.div
-          key={v.id}
-          variants={fadeUp}
-          initial="hidden"
-          animate="visible"
-          custom={i * 0.06}
-          className="will-change-transform"
-          style={{ translateZ: 0 } as React.CSSProperties}
-        >
-          <VoucherCard
-            {...v}
-            membershipStatus={membershipStatus}
-            onClaim={onClaim}
-          />
-        </motion.div>
-      ))}
-    </div>
-  </div>
-);
+// ─── Ventures (Replaces Vouchers) ──────────────────────────────────────────────
 
 // ─── TransactionLedger ────────────────────────────────────────────────────────
 const TransactionLedger: React.FC<{ transactions: any[] }> = ({
@@ -466,7 +414,7 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { details, vouchers, transactions, isLoading, claimVoucher, enableAutoPay, cancelAutoPay } =
+  const { details, ventures, transactions, isLoading, redeemVoucher, enableAutoPay, cancelAutoPay } =
     useMembership();
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
@@ -502,7 +450,7 @@ const Dashboard: React.FC = () => {
         setIsPaymentLoading(false);
       }
     } catch (err: any) {
-      setErrorModal({ title: "Setup Failed", message: err.response?.data?.error || "Failed to start AutoPay setup." });
+      setErrorModal({ title: "Setup Failed", message: err.message || err.errors?.error || "Failed to start AutoPay setup." });
       setIsPaymentLoading(false);
     }
   }, [enableAutoPay, user]);
@@ -515,7 +463,7 @@ const Dashboard: React.FC = () => {
         alert("AutoPay subscription cancelled.");
         window.location.reload();
       } catch (err: any) {
-        setErrorModal({ title: "Cancellation Failed", message: err.response?.data?.error || "Failed to cancel AutoPay." });
+        setErrorModal({ title: "Cancellation Failed", message: err.message || err.errors?.error || "Failed to cancel AutoPay." });
         setIsPaymentLoading(false);
       }
     }
@@ -716,11 +664,11 @@ const Dashboard: React.FC = () => {
                 <Route
                   path="vouchers"
                   element={
-                    <Vouchers
+                    <VentureSection
                       user={user}
                       membershipStatus={details?.status || "INACTIVE"}
-                      vouchers={vouchers}
-                      onClaim={claimVoucher}
+                      ventures={ventures}
+                      onRedeem={redeemVoucher}
                     />
                   }
                 />

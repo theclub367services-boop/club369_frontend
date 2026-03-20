@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi';
-import { MembershipDetails, Voucher, Transaction } from '../../types/membership';
+import { MembershipDetails, Venture, Transaction, RedemptionResult } from '../../types/membership';
 
 export const membershipApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -7,16 +7,17 @@ export const membershipApi = baseApi.injectEndpoints({
             query: () => '/membership/details/',
             providesTags: ['Dashboard'],
         }),
-        getVouchers: builder.query<Voucher[], void>({
-            query: () => '/vouchers/',
+        getVentures: builder.query<Venture[], void>({
+            query: () => '/vouchers/ventures/',
         }),
         getTransactions: builder.query<Transaction[], void>({
             query: () => '/membership/transactions/',
         }),
-        claimVoucher: builder.mutation<void, string>({
-            query: (voucherId) => ({
-                url: `/vouchers/claim/${voucherId}/`,
+        redeemVoucher: builder.mutation<RedemptionResult, { venture_id: string; branch_id: string; bill_amount: number }>({
+            query: (payload) => ({
+                url: `/vouchers/redeem/`,
                 method: 'POST',
+                body: payload,
             }),
         }),
     }),
@@ -24,7 +25,7 @@ export const membershipApi = baseApi.injectEndpoints({
 
 export const {
     useGetMembershipDetailsQuery,
-    useGetVouchersQuery,
+    useGetVenturesQuery,
     useGetTransactionsQuery,
-    useClaimVoucherMutation,
+    useRedeemVoucherMutation,
 } = membershipApi;

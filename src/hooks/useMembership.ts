@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { MembershipService } from '../services/MembershipService';
-import { MembershipDetails, Voucher, Transaction } from '../types/membership';
+import { MembershipDetails, Venture, Transaction } from '../types/membership';
 
 export const useMembership = () => {
     const [details, setDetails] = useState<MembershipDetails | null>(null);
-    const [vouchers, setVouchers] = useState<Voucher[]>([]);
+    const [ventures, setVentures] = useState<Venture[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -12,13 +12,13 @@ export const useMembership = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [detailsRes, vouchersRes, transactionsRes] = await Promise.all([
+                const [detailsRes, venturesRes, transactionsRes] = await Promise.all([
                     MembershipService.getMembershipDetails(),
-                    MembershipService.getVouchers(),
+                    MembershipService.getVentures(),
                     MembershipService.getTransactions(),
                 ]);
                 setDetails(detailsRes);
-                setVouchers(vouchersRes);
+                setVentures(venturesRes);
                 setTransactions(transactionsRes);
             } catch (err) {
                 setError('Failed to load membership data');
@@ -41,12 +41,11 @@ export const useMembership = () => {
         return diffDays <= 5;
     };
 
-    const claimVoucher = async (voucherId: string) => {
+    const redeemVoucher = async (ventureId: string, branchId: string, billAmount: number) => {
         try {
-            const updatedVoucher = await MembershipService.claimVoucher(voucherId);
-            setVouchers(prev => prev.map(v => v.id === voucherId ? updatedVoucher : v));
-        } catch (err) {
-            setError('Failed to claim voucher');
+            return await MembershipService.redeemVoucher(ventureId, branchId, billAmount);
+        } catch (err: any) {
+            setError(err.message || err.errors?.error || 'Failed to redeem venture');
             throw err;
         }
     };
@@ -57,8 +56,8 @@ export const useMembership = () => {
             // Optimistically update or refresh
             if (details) setDetails({ ...details, autopayStatus: 'active' });
             return res;
-        } catch (err) {
-            setError('Failed to enable AutoPay');
+        } catch (err: any) {
+            setError(err.message || err.errors?.error || 'Failed to enable AutoPay');
             throw err;
         }
     };
@@ -68,11 +67,11 @@ export const useMembership = () => {
             const res = await MembershipService.cancelAutoPay();
             if (details) setDetails({ ...details, autopayStatus: 'inactive' });
             return res;
-        } catch (err) {
-            setError('Failed to cancel AutoPay');
+        } catch (err: any) {
+            setError(err.message || err.errors?.error || 'Failed to cancel AutoPay');
             throw err;
         }
     };
 
-    return { details, vouchers, transactions, isLoading, error, isRenewalAllowed, claimVoucher, enableAutoPay, cancelAutoPay, setDetails };
+    return { details, ventures, transactions, isLoading, error, isRenewalAllowed, redeemVoucher, enableAutoPay, cancelAutoPay, setDetails };
 };
