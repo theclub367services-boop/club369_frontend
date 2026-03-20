@@ -211,7 +211,7 @@ const VentureSection: React.FC<VentureSectionProps> = ({ user, membershipStatus,
                                                 <select
                                                     value={selectedBranchId}
                                                     onChange={(e) => setSelectedBranchId(e.target.value)}
-                                                    className="w-full bg-[#0a0a0a] border border-white/10 rounded-xl p-4 text-white hover:border-white/20 focus:border-primary/50 focus:outline-none transition-colors appearance-none"
+                                                    className="w-full bg-[#0a0a0a] bg-none border border-white/10 rounded-xl p-4 text-white hover:border-white/20 focus:border-primary/50 focus:outline-none transition-colors appearance-none"
                                                 >
                                                     <option value="">Choose a branch...</option>
                                                     {selectedVenture.branches?.map(b => (
