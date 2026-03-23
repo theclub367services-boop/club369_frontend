@@ -29,7 +29,6 @@ export interface Venture {
     name: string;
     type: 'OWN' | 'PARTNER';
     discount_percentage: string;
-    poster: string | null;
     icon: string | null;
     status: 'ACTIVE' | 'SUSPENDED';
     branches?: Branch[]; 

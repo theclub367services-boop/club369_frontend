@@ -96,51 +96,62 @@ const VentureSection: React.FC<VentureSectionProps> = ({ user, membershipStatus,
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="bg-[#161118]/60 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden hover:border-primary/40 transition-all flex flex-col group h-full"
+                        className="bg-[#161118]/60 backdrop-blur-md border border-white/10 rounded-3xl p-6 flex flex-col items-center gap-4 hover:border-primary/40 transition-all group h-full shadow-2xl relative"
+                        style={{ minHeight: '260px' }}
                     >
-                        <div className="aspect-[2/3] w-full relative bg-black/40 overflow-hidden">
-                            {venture.poster ? (
+                        {/* Status Badge */}
+                        <div className="absolute top-3 right-3 bg-primary/20 text-primary text-[10px] font-black px-2 py-0.5 rounded-full border border-primary/20 backdrop-blur-md">
+                            {Math.round(parseFloat(venture.discount_percentage))}% OFF
+                        </div>
+
+                        {/* Circular Icon Container */}
+                        <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 group-hover:border-primary/30 transition-colors shadow-inner">
+                            {venture.icon ? (
                                 <img 
-                                    src={getFullUrl(venture.poster)} 
-                                    alt={venture.name} 
+                                    src={getFullUrl(venture.icon)} 
+                                    alt="icon" 
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
                                 />
                             ) : (
-                                <div className="w-full h-full flex flex-col items-center justify-center text-gray-700 bg-white/5">
-                                    <span className="material-symbols-outlined text-3xl mb-1">image_not_supported</span>
-                                    <span className="text-[10px] font-bold uppercase">No Poster</span>
-                                </div>
+                                <span className="material-symbols-outlined text-gray-500 text-3xl">storefront</span>
                             )}
-                            <div className="absolute top-2 right-2 bg-primary/90 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-lg backdrop-blur-sm">
-                                {venture.discount_percentage}% OFF
+                        </div>
+
+                        {/* Venture Info */}
+                        <div className="text-center flex-1 flex flex-col justify-center gap-2">
+                            <h3 className="text-sm font-bold text-white leading-tight [-webkit-font-smoothing:antialiased]">
+                                {venture.name}
+                            </h3>
+                            <div className="text-[9px] uppercase font-bold text-gray-500 tracking-[0.15em]">
+                                {venture.type === 'OWN' ? 'Club369 Owned' : 'Club369 Partnered'}
                             </div>
                         </div>
-                        <div className="p-3 flex-1 flex flex-col gap-3">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center overflow-hidden shrink-0 border border-white/5">
-                                    {venture.icon ? (
-                                        <img src={getFullUrl(venture.icon)} alt="icon" className="w-full h-full object-cover" />
-                                    ) : (
-                                        <span className="material-symbols-outlined text-gray-500 text-sm">storefront</span>
-                                    )}
-                                </div>
-                                <div className="min-w-0">
-                                    <h3 className="text-xs font-bold text-white truncate">{venture.name}</h3>
-                                    <div className="text-[8px] uppercase font-bold text-gray-500 truncate">
-                                        {venture.type === 'OWN' ? 'Club369 Owned' : 'Club369 Partnered'}
-                                    </div>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => handleRedeemClick(venture)}
-                                className="w-full py-2 bg-gradient-to-r from-primary to-primary/80 text-white rounded-lg text-[10px] font-black tracking-widest uppercase shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all transform active:scale-95"
-                            >
-                                Redeem
-                            </button>
-                        </div>
+
+                        {/* Large Action Button */}
+                        <button
+                            onClick={() => handleRedeemClick(venture)}
+                            className="w-full py-3 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl text-[10px] font-black tracking-[0.2em] uppercase shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+                        >
+                            Redeem Now
+                            <span className="material-symbols-outlined text-[14px]">bolt</span>
+                        </button>
                     </motion.div>
                 ))}
             </div>
+
+            {filteredVentures.length === 0 && (
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="py-20 flex flex-col items-center justify-center text-center bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm"
+                >
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 text-gray-500">
+                        <span className="material-symbols-outlined text-3xl">info</span>
+                    </div>
+                    <h3 className="text-white font-bold mb-1">No ventures found</h3>
+                    <p className="text-gray-500 text-sm">Check back later for new exclusive discounts.</p>
+                </motion.div>
+            )}
 
             <AnimatePresence>
                 {selectedVenture && (
@@ -243,7 +254,7 @@ const VentureSection: React.FC<VentureSectionProps> = ({ user, membershipStatus,
                                         {billAmount && !isNaN(parseFloat(billAmount)) && (
                                             <div className="bg-primary/5 border border-primary/20 rounded-xl p-5 space-y-3">
                                                 <div className="flex justify-between items-center text-sm">
-                                                    <span className="text-gray-400 font-bold uppercase">Discount ({selectedVenture.discount_percentage}%)</span>
+                                                    <span className="text-gray-400 font-bold uppercase">Discount ({Math.round(parseFloat(selectedVenture.discount_percentage))}%)</span>
                                                     <span className="text-emerald-400 font-mono">-₹{discountValue.toFixed(2)}</span>
                                                 </div>
                                                 <div className="h-px bg-white/10 w-full" />

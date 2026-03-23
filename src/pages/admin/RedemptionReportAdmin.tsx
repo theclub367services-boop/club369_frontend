@@ -137,7 +137,7 @@ export const RedemptionReportAdmin: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-xs text-gray-400">
                   <span>{v.branch_count} Branches</span>
-                  <span className="text-emerald-500 font-bold">{v.discount_percentage}% OFF</span>
+                  <span className="text-emerald-500 font-bold">{Math.round(parseFloat(v.discount_percentage))}% OFF</span>
                 </div>
               </div>
             ))}

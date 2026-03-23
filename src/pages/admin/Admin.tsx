@@ -184,7 +184,7 @@ const MemberModal: React.FC<{
         </div>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
               ["Email", member.email],
               ["Mobile Number", member.mobile || "N/A"],
@@ -208,7 +208,7 @@ const MemberModal: React.FC<{
                     {val}
                   </span>
                 ) : (
-                  <p className="text-sm text-white [-webkit-font-smoothing:antialiased]">
+                  <p className="text-sm text-white [-webkit-font-smoothing:antialiased] break-all">
                     {val}
                   </p>
                 )}
@@ -1236,7 +1236,7 @@ const Admin: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs text-gray-500 uppercase mb-1">Email</p>
                       <p className="text-sm text-white">{selectedMember.email}</p>

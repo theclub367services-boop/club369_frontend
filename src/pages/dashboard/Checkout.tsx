@@ -102,7 +102,7 @@ const TiltCard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Checkout: React.FC = () => {
-  const { user } = useAuth();
+  const { user, refreshUser, verifySession } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
@@ -113,6 +113,19 @@ const Checkout: React.FC = () => {
 
   const handlePayment = useCallback(async () => {
     setIsLoading(true);
+
+    // 1. Pre-flight Session Check
+    try {
+      await verifySession();
+    } catch (err: any) {
+      setErrorModal({ 
+        title: "Session Expired", 
+        message: "Your session has expired. Please log in again to continue." 
+      });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await PaymentService.handlePayment({
         prefill: {
@@ -120,25 +133,33 @@ const Checkout: React.FC = () => {
           email: user?.email || "member@club369.com",
           contact: user?.mobile || "9999999999",
         },
-        onSuccess: (verifyRes) => {
+        onSuccess: async (verifyRes) => {
           if (verifyRes) {
-            alert("Payment Successful & Membership Activated!");
-            window.location.reload();
-            // navigate("/dashboard");
+            // Smooth state refresh instead of reload
+            await refreshUser();
           }
           setIsLoading(false);
         },
         onDismiss: () => setIsLoading(false),
         onError: (error: any) => {
           console.error("Payment Error:", error);
-          setErrorModal({ title: "Payment Failed", message: error.message || "Could not connect to payment gateway." });
+          
+          let friendlyMessage = error.message || "Could not connect to payment gateway.";
+          if (friendlyMessage.includes("SDK failed to load")) {
+            friendlyMessage = "Payment gateway failing to load. Please check your internet connection or disable ad-blockers and try again.";
+          }
+
+          setErrorModal({ 
+            title: "Payment Action Needed", 
+            message: friendlyMessage 
+          });
           setIsLoading(false);
         },
       });
     } catch {
       setIsLoading(false);
     }
-  }, [user, navigate]);
+  }, [user, navigate, verifySession, refreshUser]);
 
   return (
     <div

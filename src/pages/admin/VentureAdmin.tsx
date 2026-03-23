@@ -13,7 +13,6 @@ export const VentureAdmin: React.FC = () => {
   const [formData, setFormData] = useState({ name: "", type: "OWN", discount_percentage: "" });
   const [branches, setBranches] = useState<{id: string, branch_name: string}[]>([{id: Date.now().toString(), branch_name: ""}]);
   
-  const [posterFile, setPosterFile] = useState<File | null>(null);
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +64,6 @@ export const VentureAdmin: React.FC = () => {
       setBranches([]);
     }
     
-    setPosterFile(null);
     setIconFile(null);
     setError(null);
     setShowForm(true);
@@ -75,7 +73,6 @@ export const VentureAdmin: React.FC = () => {
     setEditingId(null);
     setFormData({ name: "", type: "OWN", discount_percentage: "" });
     setBranches([{id: Date.now().toString(), branch_name: ""}]);
-    setPosterFile(null);
     setIconFile(null);
     setError(null);
     setShowForm(false);
@@ -98,9 +95,6 @@ export const VentureAdmin: React.FC = () => {
       const branchesArr = branches.map(b => b.branch_name.trim()).filter(Boolean);
       payload.append("branches", JSON.stringify(branchesArr));
       
-      if (posterFile) {
-        payload.append("poster", posterFile);
-      }
       if (iconFile) {
         payload.append("icon", iconFile);
       }
@@ -193,10 +187,6 @@ export const VentureAdmin: React.FC = () => {
                   </div>
 
                   <div>
-                     <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Poster Image</label>
-                     <input type="file" accept="image/*" onChange={e => setPosterFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30 cursor-pointer" />
-                  </div>
-                  <div>
                      <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Icon Image</label>
                      <input type="file" accept="image/*" onChange={e => setIconFile(e.target.files?.[0] || null)} className="w-full text-xs text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30 cursor-pointer" />
                   </div>
@@ -234,7 +224,7 @@ export const VentureAdmin: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4"><span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-500">{v.type}</span></td>
-                  <td className="px-6 py-4 text-emerald-500 font-bold">{v.discount_percentage}%</td>
+                  <td className="px-6 py-4 text-emerald-500 font-bold">{Math.round(parseFloat(v.discount_percentage))}%</td>
                   <td className="px-6 py-4 text-xs">{v.branch_count}</td>
                   <td className="px-6 py-4">
                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${v.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>{v.status}</span>

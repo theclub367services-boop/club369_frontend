@@ -8,6 +8,8 @@ interface AuthContextType extends AuthState {
     logout: () => Promise<void>;
     register: (data: any) => Promise<void>;
     updateProfile: (data: any) => Promise<void>;
+    refreshUser: () => Promise<void>;
+    verifySession: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -121,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // We will call it in `AppRoutes` alongside `useHeartbeat()`.
 
     return (
-        <AuthContext.Provider value={{ ...state, login, logout, register, updateProfile }}>
+        <AuthContext.Provider value={{ ...state, login, logout, register, updateProfile, refreshUser, verifySession: AuthService.verifySession }}>
             {children}
         </AuthContext.Provider>
     );
