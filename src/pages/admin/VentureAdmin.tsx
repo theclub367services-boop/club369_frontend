@@ -219,7 +219,7 @@ export const VentureAdmin: React.FC = () => {
                 <tr key={v.id} className="hover:bg-white/[0.025]">
                   <td className="px-6 py-4 font-bold text-white">
                     <div className="flex items-center gap-3">
-                      {v.icon && <img src={getFullUrl(v.icon)} className="w-8 h-8 rounded-md object-cover" />}
+                      {v.icon && <img src={getFullUrl(v.icon)} className="w-8 h-8 rounded-md object-cover flex-shrink-0" />}
                       {v.name}
                     </div>
                   </td>

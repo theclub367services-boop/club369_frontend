@@ -87,19 +87,19 @@ const StatCard: React.FC<{
                  group-hover:opacity-100 transition-opacity duration-500"
       style={{ transform: "translateZ(0)", backfaceVisibility: "hidden" }}
     />
-    <div className="relative z-10 flex justify-between items-start">
-      <div>
+    <div className="relative z-10 flex justify-between items-start gap-2">
+      <div className="min-w-0 flex-1">
         <p
           className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1
-                      [-webkit-font-smoothing:antialiased]"
+                      [-webkit-font-smoothing:antialiased] truncate"
         >
           {title}
         </p>
-        <h4 className="text-2xl font-bold text-white [-webkit-font-smoothing:antialiased]">
+        <h4 className="text-base sm:text-2xl font-bold text-white [-webkit-font-smoothing:antialiased] truncate leading-tight">
           {val}
         </h4>
       </div>
-      <span className={`material-symbols-outlined ${color}`}>{icon}</span>
+      <span className={`material-symbols-outlined flex-shrink-0 ${color}`}>{icon}</span>
     </div>
   </motion.div>
 );
@@ -200,10 +200,11 @@ const MemberModal: React.FC<{
                 {label === "Account Status" ? (
                   <span
                     className={`inline-block px-2 py-1 rounded text-xs font-bold border
-                    ${val === "ACTIVE"
+                    ${
+                      val === "ACTIVE"
                         ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
                         : "bg-red-500/10 text-red-500 border-red-500/20"
-                      }`}
+                    }`}
                   >
                     {val}
                   </span>
@@ -316,12 +317,13 @@ const VoucherRow: React.FC<{
           <span
             className={`px-2 py-0.5 rounded text-[10px] font-bold
             [-webkit-font-smoothing:antialiased]
-            ${status === "ACTIVE"
+            ${
+              status === "ACTIVE"
                 ? "bg-emerald-500/10 text-emerald-500"
                 : status === "SUSPENDED"
                   ? "bg-amber-500/10 text-amber-500"
                   : "bg-red-500/10 text-red-500"
-              }`}
+            }`}
           >
             {status}
           </span>
@@ -348,9 +350,10 @@ const VoucherRow: React.FC<{
               onClick={() => onToggle(v.id)}
               className={`px-3 py-1 rounded text-[10px] font-bold uppercase transition-colors duration-200
                 [-webkit-font-smoothing:antialiased]
-                ${v.isSuspended
-                  ? "bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white"
-                  : "bg-amber-600/10 text-amber-500 hover:bg-amber-600 hover:text-white"
+                ${
+                  v.isSuspended
+                    ? "bg-emerald-600/10 text-emerald-500 hover:bg-emerald-600 hover:text-white"
+                    : "bg-amber-600/10 text-amber-500 hover:bg-amber-600 hover:text-white"
                 }`}
             >
               {v.isSuspended ? "Resume" : "Suspend"}
@@ -428,28 +431,41 @@ const Admin: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'ALL' | 'ACTIVE' | 'EXPIRED' | 'INACTIVE'>('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState<
+    "ALL" | "ACTIVE" | "EXPIRED" | "INACTIVE"
+  >("ALL");
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [isPpHovered, setIsPpHovered] = useState(false);
 
-
   const [members, setMembers] = useState<Member[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorModal, setErrorModal] = useState<{ title: string; message: string } | null>(null);
-  const [txnSearch, setTxnSearch] = useState('');
+  const [errorModal, setErrorModal] = useState<{
+    title: string;
+    message: string;
+  } | null>(null);
+  const [txnSearch, setTxnSearch] = useState("");
   const [sortRecent, setSortRecent] = useState(true);
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
 
   // Voucher Management States
   const [vouchers, setVouchers] = useState<AdminVoucher[]>([]);
   const [showVoucherForm, setShowVoucherForm] = useState(false);
-  const [newVoucher, setNewVoucher] = useState({ title: '', code: '', expiry: '', description: '' });
-  const [expandedVoucherId, setExpandedVoucherId] = useState<string | null>(null);
-  const [voucherSearch, setVoucherSearch] = useState('');
-  const [voucherStatusFilter, setVoucherStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
+  const [newVoucher, setNewVoucher] = useState({
+    title: "",
+    code: "",
+    expiry: "",
+    description: "",
+  });
+  const [expandedVoucherId, setExpandedVoucherId] = useState<string | null>(
+    null,
+  );
+  const [voucherSearch, setVoucherSearch] = useState("");
+  const [voucherStatusFilter, setVoucherStatusFilter] = useState<
+    "all" | "active" | "suspended"
+  >("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -511,7 +527,10 @@ const Admin: React.FC = () => {
       setSelectedMember(null);
       window.location.reload();
     } catch (e: any) {
-      setErrorModal({ title: "Delete Failed", message: e.message || "Failed to delete user" });
+      setErrorModal({
+        title: "Delete Failed",
+        message: e.message || "Failed to delete user",
+      });
     }
   }, []);
 
@@ -536,12 +555,15 @@ const Admin: React.FC = () => {
     }).click();
   }, [members]);
 
-
   const handleMarkAsPaid = async (memberId: string) => {
-    if (window.confirm('Are you sure you want to mark this user as PAID manually? This will create a successful payment record and extend membership.')) {
+    if (
+      window.confirm(
+        "Are you sure you want to mark this user as PAID manually? This will create a successful payment record and extend membership.",
+      )
+    ) {
       try {
         await AdminService.markAsPaid(Number(memberId));
-        alert('User successfully marked as PAID.');
+        alert("User successfully marked as PAID.");
 
         // Refresh the whole page to force UI defaults update across the board as requested.
         window.location.reload();
@@ -549,19 +571,27 @@ const Admin: React.FC = () => {
         // Refresh members and transactions natively
         const [membersRes, transactionsRes] = await Promise.all([
           AdminService.getUsers(),
-          AdminService.getTransactions()
+          AdminService.getTransactions(),
         ]);
         setMembers(Array.isArray(membersRes) ? membersRes : []);
         setTransactions(Array.isArray(transactionsRes) ? transactionsRes : []);
 
         // Update currently viewed member
         if (membersRes) {
-          const updated = (membersRes as Member[]).find(m => m.id === memberId);
+          const updated = (membersRes as Member[]).find(
+            (m) => m.id === memberId,
+          );
           if (updated) setSelectedMember(updated);
         }
       } catch (error: any) {
         console.error("Failed to mark as paid", error);
-        setErrorModal({ title: "Update Failed", message: error?.response?.data?.error || error.message || "Failed to mark as paid" });
+        setErrorModal({
+          title: "Update Failed",
+          message:
+            error?.response?.data?.error ||
+            error.message ||
+            "Failed to mark as paid",
+        });
       }
     }
   };
@@ -725,10 +755,11 @@ const Admin: React.FC = () => {
                       className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold
                                   uppercase tracking-widest transition-colors duration-200
                                   [-webkit-font-smoothing:antialiased]
-                                  ${active
-                          ? "bg-primary text-white shadow-lg shadow-primary/20"
-                          : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white border border-white/5"
-                        }`}
+                                  ${
+                                    active
+                                      ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                      : "bg-white/5 text-gray-500 hover:bg-white/10 hover:text-white border border-white/5"
+                                  }`}
                     >
                       <span className="material-symbols-outlined text-[18px]">
                         {item.icon}
@@ -955,10 +986,11 @@ const Admin: React.FC = () => {
                                   <span
                                     className={`px-2 py-0.5 rounded text-[10px] font-bold border
                                   [-webkit-font-smoothing:antialiased]
-                                  ${member.membership_status === "ACTIVE"
-                                        ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                        : "bg-red-500/10 text-red-500 border-red-500/20"
-                                      }`}
+                                  ${
+                                    member.membership_status === "ACTIVE"
+                                      ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                      : "bg-red-500/10 text-red-500 border-red-500/20"
+                                  }`}
                                   >
                                     {member.membership_status.toUpperCase()}
                                   </span>
@@ -967,14 +999,15 @@ const Admin: React.FC = () => {
                                   <span
                                     className={`px-2 py-0.5 rounded text-[10px] font-bold border
                                   [-webkit-font-smoothing:antialiased]
-                                  ${member.autopay_status === "ENABLED"
-                                        ? "bg-purple-500/10 text-purple-500 border-purple-500/20"
-                                        : member.autopay_status === "CANCELLED"
-                                          ? "bg-orange-500/10 text-orange-500 border-orange-500/20"
-                                          : "bg-gray-500/10 text-gray-400 border-gray-500/20"
-                                      }`}
+                                  ${
+                                    member.autopay_status === "ENABLED"
+                                      ? "bg-purple-500/10 text-purple-500 border-purple-500/20"
+                                      : member.autopay_status === "CANCELLED"
+                                        ? "bg-orange-500/10 text-orange-500 border-orange-500/20"
+                                        : "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                  }`}
                                   >
-                                    {member.autopay_status || 'DISABLED'}
+                                    {member.autopay_status || "DISABLED"}
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
@@ -1086,16 +1119,20 @@ const Admin: React.FC = () => {
                         <table className="w-full text-left text-sm text-gray-400">
                           <thead className="text-[10px] uppercase font-bold text-gray-500 bg-white/5">
                             <tr>
-                              {["Date", "User", "Reference", "Amount", "Status"].map(
-                                (h, i) => (
-                                  <th
-                                    key={i}
-                                    className="px-6 py-4 [-webkit-font-smoothing:antialiased]"
-                                  >
-                                    {h}
-                                  </th>
-                                ),
-                              )}
+                              {[
+                                "Date",
+                                "User",
+                                "Reference",
+                                "Amount",
+                                "Status",
+                              ].map((h, i) => (
+                                <th
+                                  key={i}
+                                  className="px-6 py-4 [-webkit-font-smoothing:antialiased]"
+                                >
+                                  {h}
+                                </th>
+                              ))}
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-white/5">
@@ -1173,16 +1210,10 @@ const Admin: React.FC = () => {
                 />
 
                 {/* ── Ventures ── */}
-                <Route
-                  path="ventures"
-                  element={<VentureAdmin />}
-                />
-                
+                <Route path="ventures" element={<VentureAdmin />} />
+
                 {/* ── Redemptions ── */}
-                <Route
-                  path="redemptions"
-                  element={<RedemptionReportAdmin />}
-                />
+                <Route path="redemptions" element={<RedemptionReportAdmin />} />
               </Routes>
             </motion.div>
           </AnimatePresence>
@@ -1213,18 +1244,22 @@ const Admin: React.FC = () => {
                       onMouseLeave={() => setIsPpHovered(false)}
                     >
                       {selectedMember.profile_picture ? (
-                        <img src={getFullUrl(selectedMember.profile_picture) || ''} alt={selectedMember.name} className="w-full h-full object-cover" />
+                        <img
+                          src={getFullUrl(selectedMember.profile_picture) || ""}
+                          alt={selectedMember.name}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
-                        <span className="material-symbols-outlined text-3xl text-primary/40">person</span>
+                        <span className="material-symbols-outlined text-3xl text-primary/40">
+                          person
+                        </span>
                       )}
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-white mb-1">
                         {selectedMember.name}
                       </h3>
-                      <p className="text-sm text-gray-400">
-                        Member Details
-                      </p>
+                      <p className="text-sm text-gray-400">Member Details</p>
                     </div>
                   </div>
                   <button
@@ -1238,32 +1273,54 @@ const Admin: React.FC = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Email</p>
-                      <p className="text-sm text-white">{selectedMember.email}</p>
+                      <p className="text-xs text-gray-500 uppercase mb-1">
+                        Email
+                      </p>
+                      <p className="text-sm text-white">
+                        {selectedMember.email}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Mobile Number</p>
-                      <p className="text-sm text-white">{selectedMember.mobile || 'N/A'}</p>
+                      <p className="text-xs text-gray-500 uppercase mb-1">
+                        Mobile Number
+                      </p>
+                      <p className="text-sm text-white">
+                        {selectedMember.mobile || "N/A"}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Joined</p>
-                      <p className="text-sm text-white">{formatDate(selectedMember.created_at)}</p>
+                      <p className="text-xs text-gray-500 uppercase mb-1">
+                        Joined
+                      </p>
+                      <p className="text-sm text-white">
+                        {formatDate(selectedMember.created_at)}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Account Status</p>
+                      <p className="text-xs text-gray-500 uppercase mb-1">
+                        Account Status
+                      </p>
                       <span
-                        className={`inline-block px-2 py-1 rounded text-xs font-bold ${selectedMember.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-red-500/10 text-red-500 border-red-500/20'}`}
+                        className={`inline-block px-2 py-1 rounded text-xs font-bold ${selectedMember.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}`}
                       >
                         {selectedMember.status}
                       </span>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Last Payment</p>
-                      <p className="text-sm text-white">{formatDate(selectedMember.last_payment_date)}</p>
+                      <p className="text-xs text-gray-500 uppercase mb-1">
+                        Last Payment
+                      </p>
+                      <p className="text-sm text-white">
+                        {formatDate(selectedMember.last_payment_date)}
+                      </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 uppercase mb-1">Next Billing</p>
-                      <p className="text-sm text-white">{formatDate(selectedMember.membership_end_date)}</p>
+                      <p className="text-xs text-gray-500 uppercase mb-1">
+                        Next Billing
+                      </p>
+                      <p className="text-sm text-white">
+                        {formatDate(selectedMember.membership_end_date)}
+                      </p>
                     </div>
                   </div>
 
@@ -1274,24 +1331,29 @@ const Admin: React.FC = () => {
                                         >
                                             Send Reminder
                                         </button> */}
-                    {selectedMember.membership_status !== 'ACTIVE' && (
-
+                    {selectedMember.membership_status !== "ACTIVE" && (
                       <>
                         {selectedMember.mobile && (
                           <button
-                            onClick={() => window.location.href = `tel:${selectedMember.mobile}`}
+                            onClick={() =>
+                              (window.location.href = `tel:${selectedMember.mobile}`)
+                            }
                             className="flex-1 px-4 py-2 bg-primary/10 border border-primary/20 text-primary text-sm font-bold rounded-lg hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2"
                           >
-                            <span className="material-symbols-outlined text-lg">call</span>
+                            <span className="material-symbols-outlined text-lg">
+                              call
+                            </span>
                             <span>Call Member</span>
                           </button>
                         )}
-                        {selectedMember.status !== 'ACTIVE' && (
+                        {selectedMember.status !== "ACTIVE" && (
                           <button
                             onClick={() => handleDeleteUser(selectedMember.id)}
                             className="flex-1 px-4 py-2 bg-red-600/10 border border-red-600/20 text-red-500 text-sm font-bold rounded-lg hover:bg-red-600 hover:text-white transition-all flex items-center justify-center gap-2"
                           >
-                            <span className="material-symbols-outlined text-lg">delete</span>
+                            <span className="material-symbols-outlined text-lg">
+                              delete
+                            </span>
                             <span>Delete User</span>
                           </button>
                         )}
@@ -1299,7 +1361,9 @@ const Admin: React.FC = () => {
                           onClick={() => handleMarkAsPaid(selectedMember.id)}
                           className="flex-1 px-4 py-2 bg-emerald-600 border border-emerald-500 text-white text-sm font-bold rounded-lg hover:bg-emerald-500 transition-all flex items-center justify-center gap-2"
                         >
-                          <span className="material-symbols-outlined text-lg">payments</span>
+                          <span className="material-symbols-outlined text-lg">
+                            payments
+                          </span>
                           <span>Mark as PAID</span>
                         </button>
                         {/* <button
@@ -1315,8 +1379,6 @@ const Admin: React.FC = () => {
                                                     Cancel Membership
                                                 </button> */}
                       </>
-
-
                     )}
                   </div>
                 </div>
@@ -1332,7 +1394,7 @@ const Admin: React.FC = () => {
                     exit={{ opacity: 0, scale: 0.5 }}
                   >
                     <img
-                      src={getFullUrl(selectedMember.profile_picture) || ''}
+                      src={getFullUrl(selectedMember.profile_picture) || ""}
                       alt={selectedMember.name}
                       className="w-full h-full object-cover"
                     />
@@ -1351,7 +1413,7 @@ const Admin: React.FC = () => {
         message={errorModal?.message ?? ""}
         onClose={() => setErrorModal(null)}
       />
-    </DashboardLayout >
+    </DashboardLayout>
   );
 };
 
@@ -1397,7 +1459,12 @@ const ErrorModal: React.FC<{
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 340, damping: 28, delay: 0.18 }}
+            transition={{
+              type: "spring",
+              stiffness: 340,
+              damping: 28,
+              delay: 0.18,
+            }}
             className="relative z-10 mx-auto mb-6 w-20 h-20 rounded-full
                        bg-red-500/15 border border-red-500/30
                        flex items-center justify-center will-change-transform"
@@ -1406,7 +1473,12 @@ const ErrorModal: React.FC<{
             <motion.div
               className="absolute inset-0 rounded-full border border-red-500/25 will-change-transform"
               animate={{ opacity: [0.8, 0], scale: [1, 1.55] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
+              transition={{
+                duration: 1.8,
+                repeat: Infinity,
+                ease: "easeOut",
+                delay: 0.5,
+              }}
               style={{ translateZ: 0 } as React.CSSProperties}
             />
             <motion.span
@@ -1455,7 +1527,9 @@ const ErrorModal: React.FC<{
                          will-change-transform [-webkit-font-smoothing:antialiased]"
               style={{ translateZ: 0 } as React.CSSProperties}
             >
-              <span className="material-symbols-outlined text-[16px]">refresh</span>
+              <span className="material-symbols-outlined text-[16px]">
+                refresh
+              </span>
               Try Again
             </motion.button>
           </motion.div>
