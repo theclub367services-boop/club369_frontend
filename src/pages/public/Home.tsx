@@ -663,7 +663,7 @@ const Home: React.FC = () => {
                 {
                   name: "FEEL LABAN",
                   logo: feellabanLogo,
-                  subtitle: "Feel Laban - The Best Juice Spot",
+                  subtitle: "Feel Laban - The Best Dessert Spot",
                 },
                 {
                   name: "P-SQUARE",
