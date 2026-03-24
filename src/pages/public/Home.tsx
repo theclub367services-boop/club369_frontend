@@ -13,9 +13,15 @@ import teashopLogo from "../../../public/images/tea-shop.jpeg";
 import unisexLogo from "../../../public/images/unisex.jpeg";
 import goatfarmLogo from "../../../public/images/goat-farm.jpeg";
 import photographyLogo from "../../../public/images/photography.jpeg";
-import medicalLogo from "../../../public/images/medical.jpeg";
+// import medicalLogo from "../../../public/images/medical.jpeg";
 import fireworksLogo from "../../../public/images/fireworks.jpeg";
 import snookerLogo from "../../../public/images/snooker.jpeg";
+import metroLogo from "../../../public/images/metro-gadgetz.png";
+import feellabanLogo from "../../../public/images/feel-laban.jpeg";
+import psquareLogo from "../../../public/images/p-square.jpeg";
+import juiceSpotLogo from "../../../public/images/juice-spot.png";
+import airTravelLogo from "../../../public/images/air-travel.png";
+import pickleballLogo from "../../../public/images/pickleball.png";
 
 const APPLE_EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -645,9 +651,39 @@ const Home: React.FC = () => {
                   subtitle: "Football & Cricket Turf",
                 },
                 {
-                  name: "SPORTIC",
+                  name: "Sportic",
                   logo: sporticLogo,
                   subtitle: "A Sport App for Enthusiasts",
+                },
+                {
+                  name: "Metro Gadgetz",
+                  logo: metroLogo,
+                  subtitle: "Metro Gadgetz - The Apple Expert",
+                },
+                {
+                  name: "FEEL LABAN",
+                  logo: feellabanLogo,
+                  subtitle: "Feel Laban - The Best Juice Spot",
+                },
+                {
+                  name: "P-SQUARE",
+                  logo: psquareLogo,
+                  subtitle: "P-SQUARE - The Men's Wear T-Shirt | Shirt | Jeans",
+                },
+                {
+                  name: "Juice Spot",
+                  logo: juiceSpotLogo,
+                  subtitle: "Juice Spot - The Best Juice Spot",
+                },
+                {
+                  name: "PICKLEBALL45",
+                  logo: pickleballLogo,
+                  subtitle: "Pickleball45 - The Best Pickleball Court",
+                },
+                {
+                  name: "AL-PARVEZ INTERNATIONAL",
+                  logo: airTravelLogo,
+                  subtitle: "AL-PARVEZ INTERNATIONAL - The Air Travel & Services",
                 },
               ].map((venture, i) => (
                 <motion.div
