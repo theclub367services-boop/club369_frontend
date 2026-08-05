@@ -536,22 +536,23 @@ const Admin: React.FC = () => {
 
   const handleExportData = useCallback(() => {
     const csv = [
-      ["Name", "Email", "Status", "Last Payment", "Phone", "Created At"],
-      ...members.map((m) => [
+      ["Name", "Email", "Status", "Last Payment", "Amount Paid", "Phone", "Created At"],
+      ...members.map((m: any) => [
         m.name,
         m.email,
         m.status,
         formatDate(m.last_payment_date),
+        m.total_amount_paid ? `₹${m.total_amount_paid}` : "NA",
         m.mobile || "",
         formatDate(m.created_at),
       ]),
     ]
       .map((r) => r.join(","))
       .join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const url = URL.createObjectURL(new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8;" }));
     Object.assign(document.createElement("a"), {
       href: url,
-      download: `members-${new Date().toISOString().split("T")[0]}.csv`,
+      download: `Total user database-${new Date().toISOString().split("T")[0]}.csv`,
     }).click();
   }, [members]);
 
@@ -1138,10 +1139,7 @@ const Admin: React.FC = () => {
                           <tbody className="divide-y divide-white/5">
                             {transactions
                               .filter((t) => {
-                                const name =
-                                  typeof t.user === "string"
-                                    ? t.user
-                                    : (t.user as any)?.name || "";
+                                const name = t.user_name || (typeof t.user === "string" ? t.user : "");
                                 const ts = new Date(t.date).getTime();
                                 const s = dateRange.start
                                   ? new Date(dateRange.start).getTime()
