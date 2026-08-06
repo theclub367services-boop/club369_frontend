@@ -75,7 +75,7 @@ const Login: React.FC = () => {
     setSigningIn(true); // ← show LoadingScreen
 
     try {
-      await login(email, password);
+      await login(email.trim().toLowerCase(), password);
 
       // LoadingScreen's own stepped progress runs up to ~90%.
       // A 420 ms pause lets it spring to 100% before we navigate.
@@ -117,7 +117,7 @@ const Login: React.FC = () => {
     setResetMessage("");
 
     try {
-      await AuthService.forgotPassword(resetEmail);
+      await AuthService.forgotPassword(resetEmail.trim().toLowerCase());
       setResetStatus("success");
       setResetMessage("A reset link has been sent to your email address.");
       setTimeout(() => {
